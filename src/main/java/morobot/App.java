@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Activity;
 
 public class App {
     static JDA builder;
-    private static final String token = "NzA1MzQ5NzU1MjEwOTU2ODAw.Xrx31w.ohw7-tVr7-smB-Fv526ezIV0UMI";
     public static String prefix = "!";
 
     public static void main(String[] args) throws Exception {
