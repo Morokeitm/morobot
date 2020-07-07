@@ -1,0 +1,2 @@
+# morobot
+Discord bot
