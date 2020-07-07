@@ -16,8 +16,7 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         final String token = args[0];
-        builder = new JDABuilder(AccountType.BOT)
-                .setToken(token)
+        builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.watching("Руководство по написанию ботов"))
                 .build();
 
