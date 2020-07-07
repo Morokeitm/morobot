@@ -49,6 +49,7 @@ public class ShowAvatar extends ListenerAdapter {
         }
     }
     private void sendImage(MessageReceivedEvent event, String imageUrL) {
+        event.getMessage().delete().queue();
         image.setImage(imageUrL);
         image.setColor(0x14f51b);
         event.getChannel().sendMessage(image.build()).queue();
