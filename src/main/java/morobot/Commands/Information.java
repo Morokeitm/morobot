@@ -55,7 +55,9 @@ public class Information extends ListenerAdapter {
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
-        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) && !event.getUser().isBot()) {
+        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &&
+                event.getReactionEmote().getName().equals("❌") &&
+                !event.getUser().isBot()) {
             Map<User, String> copy = new HashMap<>(users);
             copy.forEach((user, id) -> {
                 if (event.getMessageId().equals(id)) users.remove(user);
