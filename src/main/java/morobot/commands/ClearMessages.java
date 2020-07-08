@@ -18,30 +18,30 @@ public class ClearMessages extends ListenerAdapter {
         if(args[0].equalsIgnoreCase(App.prefix + "clear")) {
             if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE)) {
                 if (args.length < 2) {
-                    noCountOfMessagesException(event);
+                    noCountOfMessagesExceptionEmbed(event);
                 } else {
                     try {
-                        deleteMessages(event, args[1]);
+                        deletedMessagesEmbed(event, args[1]);
                     } catch (NumberFormatException e) {
-                        notNumberException(event);
+                        notNumberExceptionEmbed(event);
                     } catch (IllegalArgumentException e) {
                         if (e.toString().startsWith("java.lang.IllegalArgumentException: Message retrieval") ||
                                 e.toString().startsWith("java.lang.IllegalArgumentException: Must provide at least 2")) {
                             //Слишком много/мало сообщений
-                            illegalCountOfMessagesException(event);
+                            illegalCountOfMessagesExceptionEmbed(event);
                         } else {
                             //Слишком старые сообщения
-                            tooOldMessageException(event);
+                            tooOldMessageExceptionEmbed(event);
                         }
                     }
                 }
             } else {
-                noPermissionsToDeleteException(event);
+                noPermissionsToDeleteExceptionEmbed(event);
             }
         }
     }
 
-    private void notNumberException(GuildMessageReceivedEvent event) {
+    private void notNumberExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder usage = new EmbedBuilder();
         usage.setColor(0xf2480a);
@@ -54,7 +54,7 @@ public class ClearMessages extends ListenerAdapter {
         usage.clear();
     }
 
-    private void noCountOfMessagesException(GuildMessageReceivedEvent event) {
+    private void noCountOfMessagesExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder usage = new EmbedBuilder();
         usage.setColor(0xf2480a);
@@ -66,7 +66,7 @@ public class ClearMessages extends ListenerAdapter {
                 .queue();
         usage.clear();
     }
-    private void deleteMessages(GuildMessageReceivedEvent event, String count) {
+    private void deletedMessagesEmbed(GuildMessageReceivedEvent event, String count) {
         List<Message> messages = event.getChannel().getHistory().retrievePast(Integer.parseInt(count) + 1).complete();
         event.getChannel().deleteMessages(messages).queue();
         EmbedBuilder complete = new EmbedBuilder();
@@ -79,7 +79,7 @@ public class ClearMessages extends ListenerAdapter {
                 .queue();
         complete.clear();
     }
-    private void illegalCountOfMessagesException(GuildMessageReceivedEvent event) {
+    private void illegalCountOfMessagesExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
@@ -91,7 +91,7 @@ public class ClearMessages extends ListenerAdapter {
                 .queue();
         error.clear();
     }
-    private void tooOldMessageException(GuildMessageReceivedEvent event) {
+    private void tooOldMessageExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
@@ -103,7 +103,7 @@ public class ClearMessages extends ListenerAdapter {
                 .queue();
         error.clear();
     }
-    private void noPermissionsToDeleteException(GuildMessageReceivedEvent event) {
+    private void noPermissionsToDeleteExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);

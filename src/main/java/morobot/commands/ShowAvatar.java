@@ -4,14 +4,10 @@ import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.annotation.Nonnull;
-import javax.swing.plaf.nimbus.AbstractRegionPainter;
 import java.util.concurrent.TimeUnit;
 
 public class ShowAvatar extends ListenerAdapter {
@@ -29,9 +25,9 @@ public class ShowAvatar extends ListenerAdapter {
                     /*если хочет посмотреть свой аватар.
                      проверяем есть ли аватар у пользователя*/
                     if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
-                        sendImage(event, imageUrl);
+                        sendImageEmbed(event, imageUrl);
                     } else {
-                        noAvatarException(event);
+                        noAvatarExceptionEmbed(event);
                     }
                 } else if (args.length == 2) {
                     /* если хочет посмотреть чей-то аватар.
@@ -42,21 +38,21 @@ public class ShowAvatar extends ListenerAdapter {
                                 args[1].replace("<@", "").replace(">", "");
                         Member member = event.getGuild().getMemberById(id);
                         if (member == null) {
-                            noMemberException(event);
+                            noMemberExceptionEmbed(event);
                         } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
-                            sendImage(event, imageUrl);
+                            sendImageEmbed(event, imageUrl);
                         } else {
-                            memberHasNoAvatarException(event);
+                            memberHasNoAvatarExceptionEmbed(event);
                         }
                     } else {
-                        sendError(event);
+                        noMemberMentionEmbed(event);
                     }
                 }
             }
         }
     }
 
-    private void memberHasNoAvatarException(GuildMessageReceivedEvent event) {
+    private void memberHasNoAvatarExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder noAvatar = new EmbedBuilder();
         noAvatar.setColor(0xf2480a);
@@ -68,7 +64,7 @@ public class ShowAvatar extends ListenerAdapter {
         noAvatar.clear();
     }
 
-    private void noMemberException(GuildMessageReceivedEvent event) {
+    private void noMemberExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder noAvatar = new EmbedBuilder();
         noAvatar.setColor(0xf2480a);
@@ -80,7 +76,7 @@ public class ShowAvatar extends ListenerAdapter {
         noAvatar.clear();
     }
 
-    private void noAvatarException(GuildMessageReceivedEvent event) {
+    private void noAvatarExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder noAvatar = new EmbedBuilder();
         noAvatar.setColor(0xf2480a);
@@ -92,7 +88,7 @@ public class ShowAvatar extends ListenerAdapter {
         noAvatar.clear();
     }
 
-    private void sendImage(GuildMessageReceivedEvent event, String imageUrL) {
+    private void sendImageEmbed(GuildMessageReceivedEvent event, String imageUrL) {
         event.getMessage().delete().queue();
         image.setImage(imageUrL);
         image.setColor(0x14f51b);
@@ -100,7 +96,7 @@ public class ShowAvatar extends ListenerAdapter {
         image.clear();
     }
 
-    private void sendError(GuildMessageReceivedEvent event) {
+    private void noMemberMentionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder needMention = new EmbedBuilder();
         needMention.setColor(0xf2480a);

@@ -45,21 +45,21 @@ public class Mute extends ListenerAdapter {
             Role role = event.getGuild().getRoleById("730486590870126623");
             if (!member.getRoles().contains(role)) {
                 try {
-                    if (member.hasPermission(Permission.MANAGE_ROLES)) hierarchyException(event);
+                    if (member.hasPermission(Permission.MANAGE_ROLES)) hierarchyExceptionEmbed(event);
                     int time = Integer.parseInt(args[2]);
                     event.getGuild().addRoleToMember(id, role).queue();
                     //Таймер
                     startTimer(event, time, role);
-                    timeRoleAdded(event, time);
+                    roleAddEmbed(event, time);
                 } catch (NumberFormatException e) {
-                    incorrectTimeException(event);
+                    incorrectTimeExceptionEmbed(event);
                 } catch (IllegalArgumentException e) {
-                    tooLongTimeException(event);
+                    tooLongTimeExceptionEmbed(event);
                 }
             } else {
-                alreadyMutedException(event);
+                alreadyMutedExceptionEmbed(event);
             }
-        } else noMemberException(event);
+        } else noMemberExceptionEmbed(event);
     }
 
     private void startTimer(GuildMessageReceivedEvent event, int time, Role role) {
@@ -69,7 +69,7 @@ public class Mute extends ListenerAdapter {
             public void run() {
                 if (member.getRoles().contains(role)) {
                     event.getGuild().removeRoleFromMember(member, role).queue();
-                    roleRemoved(event, member);
+                    roleRemovedEmbed(event, member);
                 }
             }
         }, time * 60000);
@@ -88,13 +88,13 @@ public class Mute extends ListenerAdapter {
                     event.getGuild().addRoleToMember(id, role).queue();
                     roleAddEmbed(event);
                 } catch (HierarchyException e) {
-                    hierarchyException(event);
+                    hierarchyExceptionEmbed(event);
                 }
-            } else alreadyMutedException(event);
-        } else noMemberException(event);
+            } else alreadyMutedExceptionEmbed(event);
+        } else noMemberExceptionEmbed(event);
     }
 
-    private void tooLongTimeException(GuildMessageReceivedEvent event) {
+    private void tooLongTimeExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder incorrectTime = new EmbedBuilder();
         incorrectTime.setColor(0xf2480a);
@@ -108,7 +108,21 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void timeRoleAdded(GuildMessageReceivedEvent event, int time) {
+    private void roleAddEmbed(GuildMessageReceivedEvent event) {
+        event.getMessage().delete().queue();
+        EmbedBuilder succeed = new EmbedBuilder();
+        succeed.setColor(0xfcba03);
+        succeed.setTitle("Отстранение:");
+        succeed.setDescription(member.getUser().getName());
+        event.getChannel().sendMessage(succeed.build())
+                .delay(5, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
+        succeed.clear();
+        member = null;
+    }
+
+    private void roleAddEmbed(GuildMessageReceivedEvent event, int time) {
         event.getMessage().delete().queue();
         String timeText = "";
         if (time < 60) timeText = "Минут: " + time;
@@ -134,7 +148,7 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void roleRemoved(GuildMessageReceivedEvent event, Member member) {
+    private void roleRemovedEmbed(GuildMessageReceivedEvent event, Member member) {
         event.getMessage().delete().queue();
         EmbedBuilder removeRole = new EmbedBuilder();
         removeRole.setColor(0x14f51b);
@@ -147,7 +161,7 @@ public class Mute extends ListenerAdapter {
         removeRole.clear();
     }
 
-    private void incorrectTimeException(GuildMessageReceivedEvent event) {
+    private void incorrectTimeExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder incorrectTime = new EmbedBuilder();
         incorrectTime.setColor(0xf2480a);
@@ -161,7 +175,7 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void hierarchyException(GuildMessageReceivedEvent event) {
+    private void hierarchyExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder hierarchy = new EmbedBuilder();
         hierarchy.setColor(0xf2480a);
@@ -174,7 +188,7 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void noMemberException(GuildMessageReceivedEvent event) {
+    private void noMemberExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder noMember = new EmbedBuilder();
         noMember.setColor(0xf2480a);
@@ -186,7 +200,7 @@ public class Mute extends ListenerAdapter {
         noMember.clear();
     }
 
-    private void alreadyMutedException(GuildMessageReceivedEvent event) {
+    private void alreadyMutedExceptionEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder muted = new EmbedBuilder();
         muted.setColor(0xf2480a);
@@ -196,20 +210,6 @@ public class Mute extends ListenerAdapter {
                 .flatMap(Message::delete)
                 .queue();
         muted.clear();
-        member = null;
-    }
-
-    private void roleAddEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder succeed = new EmbedBuilder();
-        succeed.setColor(0xfcba03);
-        succeed.setTitle("Отстранение:");
-        succeed.setDescription(member.getUser().getName());
-        event.getChannel().sendMessage(succeed.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        succeed.clear();
         member = null;
     }
 }
