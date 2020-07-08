@@ -24,65 +24,74 @@ public class Mute extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
-
                 //Команда без счетчика времени.
                 if (args.length == 2 && args[1].startsWith("<@")) {
-                    String id = args[1].startsWith("<@!") ?
-                            args[1].replace("<@!", "").replace(">", "") :
-                            args[1].replace("<@", "").replace(">", "");
-                    member = event.getGuild().getMemberById(id);
-                    if (member != null) {
-                        Role role = event.getGuild().getRoleById("730486590870126623");
-                        if (!member.getRoles().contains(role)) {
-                            try {
-                                if (member.hasPermission(Permission.MANAGE_ROLES)) throw new HierarchyException("");
-                                event.getGuild().addRoleToMember(id, role).queue();
-                                roleAdded(event);
-                            } catch (HierarchyException e) {
-                                hierarchyException(event);
-                            }
-                        } else alreadyMutedException(event);
-                    } else noMemberException(event);
+                    muteWithoutTimeSchedule(event, args);
                 }
-
                 //Команда со счетчиком времени.
                 if (args.length == 3 && args[1].startsWith("<@")) {
-                    String id = args[1].startsWith("<@!") ?
-                            args[1].replace("<@!", "").replace(">", "") :
-                            args[1].replace("<@", "").replace(">", "");
-                    member = event.getGuild().getMemberById(id);
-                    if (member != null) {
-                        Role role = event.getGuild().getRoleById("730486590870126623");
-                        if (!member.getRoles().contains(role)) {
-                            try {
-                                if (member.hasPermission(Permission.MANAGE_ROLES)) hierarchyException(event);
-                                int time = Integer.parseInt(args[2]);
-                                event.getGuild().addRoleToMember(id, role).queue();
-                                //Таймер
-                                new Timer().schedule(new TimerTask() {
-                                    Member member = Mute.member;
-
-                                    @Override
-                                    public void run() {
-                                        if (member.getRoles().contains(role)) {
-                                            event.getGuild().removeRoleFromMember(member, role).queue();
-                                            roleRemoved(event, member);
-                                        }
-                                    }
-                                }, time * 60000);
-                                timeRoleAdded(event, time);
-                            } catch (NumberFormatException e) {
-                                incorrectTimeException(event);
-                            } catch (IllegalArgumentException e) {
-                                tooLongTimeException(event);
-                            }
-                        } else {
-                            alreadyMutedException(event);
-                        }
-                    } else noMemberException(event);
+                    muteWithTimeSchedule(event, args);
                 }
             }
         }
+    }
+
+    private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
+        String id = args[1].startsWith("<@!") ?
+                args[1].replace("<@!", "").replace(">", "") :
+                args[1].replace("<@", "").replace(">", "");
+        member = event.getGuild().getMemberById(id);
+        if (member != null) {
+            Role role = event.getGuild().getRoleById("730486590870126623");
+            if (!member.getRoles().contains(role)) {
+                try {
+                    if (member.hasPermission(Permission.MANAGE_ROLES)) hierarchyException(event);
+                    int time = Integer.parseInt(args[2]);
+                    event.getGuild().addRoleToMember(id, role).queue();
+                    //Таймер
+                    startTimer(event, time, role);
+                    timeRoleAdded(event, time);
+                } catch (NumberFormatException e) {
+                    incorrectTimeException(event);
+                } catch (IllegalArgumentException e) {
+                    tooLongTimeException(event);
+                }
+            } else {
+                alreadyMutedException(event);
+            }
+        } else noMemberException(event);
+    }
+
+    private void startTimer(GuildMessageReceivedEvent event, int time, Role role) {
+        new Timer().schedule(new TimerTask() {
+            Member member = Mute.member;
+            @Override
+            public void run() {
+                if (member.getRoles().contains(role)) {
+                    event.getGuild().removeRoleFromMember(member, role).queue();
+                    roleRemoved(event, member);
+                }
+            }
+        }, time * 60000);
+    }
+
+    private void muteWithoutTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
+        String id = args[1].startsWith("<@!") ?
+                args[1].replace("<@!", "").replace(">", "") :
+                args[1].replace("<@", "").replace(">", "");
+        member = event.getGuild().getMemberById(id);
+        if (member != null) {
+            Role role = event.getGuild().getRoleById("730486590870126623");
+            if (!member.getRoles().contains(role)) {
+                try {
+                    if (member.hasPermission(Permission.MANAGE_ROLES)) throw new HierarchyException("");
+                    event.getGuild().addRoleToMember(id, role).queue();
+                    roleAddEmbed(event);
+                } catch (HierarchyException e) {
+                    hierarchyException(event);
+                }
+            } else alreadyMutedException(event);
+        } else noMemberException(event);
     }
 
     private void tooLongTimeException(GuildMessageReceivedEvent event) {
@@ -190,7 +199,7 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void roleAdded(GuildMessageReceivedEvent event) {
+    private void roleAddEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
         EmbedBuilder succeed = new EmbedBuilder();
         succeed.setColor(0xfcba03);

@@ -49,6 +49,10 @@ public class Information extends ListenerAdapter {
             }
         }
         //Добавление реакции Х к сообщению от бота.
+        addReactionToInfo(event);
+    }
+
+    private void addReactionToInfo(GuildMessageReceivedEvent event) {
         if (reaction && event.getMember().getUser().isBot() &&
                 event.getMessage().getContentDisplay().equals("")) {
             users.put(event.getMessage().getId(), user);
@@ -57,6 +61,7 @@ public class Information extends ListenerAdapter {
             user = null;
         }
     }
+
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
