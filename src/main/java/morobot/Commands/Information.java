@@ -16,7 +16,7 @@ public class Information extends ListenerAdapter {
 
     private static boolean reaction = false;
     private static User user;
-    private static Map <User, String> users = new HashMap<>();
+    private static Map <String, User> users = new HashMap<>();
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
@@ -46,7 +46,7 @@ public class Information extends ListenerAdapter {
         //Добавление реакции Х к сообщению от бота.
         if (event.getMember().getUser().isBot() &&
                 event.getMessage().getContentDisplay().equals("") && reaction) {
-            users.put(user, event.getMessage().getId());
+            users.put(event.getMessage().getId(), user);
             event.getMessage().addReaction("❌").queue();
             reaction = false;
             user = null;
@@ -58,16 +58,14 @@ public class Information extends ListenerAdapter {
         if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &&
                 event.getReactionEmote().getName().equals("❌") &&
                 !event.getUser().isBot()) {
-            Map<User, String> copy = new HashMap<>(users);
-            copy.forEach((user, id) -> {
-                if (event.getMessageId().equals(id)) users.remove(user);
-            });
+            //проверка нужна, чтобы не было краша после перезапуска программы с уже вызванной до этого командой, когда удаление будет делаться с пустой HashMap.
+            if(users.containsKey(event.getMessageId())) users.remove(event.getMessageId());
             event.getChannel().deleteMessageById(event.getMessageId()).queue();
         }
         if(event.getReactionEmote().getName().equals("❌") &&
-                users.containsKey(event.getUser())) {
-            if (event.getMessageId().equals(users.get(event.getUser()))) {
-                users.remove(event.getUser());
+                users.containsKey(event.getMessageId())) {
+            if (event.getUser().equals(users.get(event.getMessageId()))) {
+                users.remove(event.getMessageId());
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
         }
