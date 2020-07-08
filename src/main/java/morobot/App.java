@@ -1,6 +1,7 @@
 package morobot;
 
 import morobot.commands.*;
+import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -12,7 +13,7 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         final String token = args[0];
-        builder = JDABuilder.createDefault(token)
+        builder = new JDABuilder(AccountType.BOT).setToken(args[0])
                 .setActivity(Activity.watching("Руководство по написанию ботов"))
                 .build();
 

@@ -37,6 +37,11 @@ public class Information extends ListenerAdapter {
                             "Написали много лишнего? Я удалю эти сообщения!\n" +
                                     "Имей в виду, что за один раз я смогу удалить не больше 99 сообщений.", false);
                 }
+                if (event.getMember().getPermissions().contains(Permission.MANAGE_ROLES)) {
+                    info.addField(App.prefix + "MUTE [USER] [TIME (optional, min)]",
+                            "Кто-то плохо себя ведет? Пусть подумает над своим поведением.\n" +
+                                    "Если не укажешь продолжительность, отстранение придется снимать вручную.", false);
+                }
                 info.setFooter("Developed by Morokei_tm", "https://cdn.discordapp.com/avatars/319137115139080192/27b8ae9889feb379950af141841d48b4.png");
                 info.setColor(0x2374de);
                 event.getChannel().sendMessage(info.build()).queue();
@@ -44,7 +49,7 @@ public class Information extends ListenerAdapter {
             }
         }
         //Добавление реакции Х к сообщению от бота.
-        if (reaction & event.getMember().getUser().isBot() &&
+        if (reaction && event.getMember().getUser().isBot() &&
                 event.getMessage().getContentDisplay().equals("")) {
             users.put(event.getMessage().getId(), user);
             event.getMessage().addReaction("❌").queue();
@@ -55,7 +60,7 @@ public class Information extends ListenerAdapter {
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
-        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &
+        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &&
                 event.getReactionEmote().getName().equals("❌") &&
                 !event.getUser().isBot()) {
             //проверка нужна, чтобы не было краша после перезапуска программы с уже вызванной до этого командой, когда удаление будет делаться с пустой HashMap.
