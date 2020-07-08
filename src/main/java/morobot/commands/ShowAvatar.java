@@ -30,7 +30,7 @@ public class ShowAvatar extends ListenerAdapter {
                     if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
                         sendImage(event, imageUrl);
                     } else {
-                        event.getChannel().sendMessage("У тебя нет картинки на аватаре, что я тебе показать должен?").queue();
+                        noAvatarException(event);
                     }
                 } else if (args.length == 2) {
                     // если хочет посмотреть чей-то аватар.
@@ -52,6 +52,19 @@ public class ShowAvatar extends ListenerAdapter {
             }
         }
     }
+
+    private void noAvatarException(MessageReceivedEvent event) {
+        event.getMessage().delete().queue();
+        EmbedBuilder noAvatar = new EmbedBuilder();
+        noAvatar.setColor(0xf2480a);
+        noAvatar.setDescription("У тебя нет картинки на аватаре, что я тебе показать должен?");
+        event.getChannel().sendMessage(noAvatar.build())
+                .delay(5, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
+        noAvatar.clear();
+    }
+
     private void sendImage(MessageReceivedEvent event, String imageUrL) {
         event.getMessage().delete().queue();
         image.setImage(imageUrL);

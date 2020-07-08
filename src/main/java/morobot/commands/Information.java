@@ -44,8 +44,8 @@ public class Information extends ListenerAdapter {
             }
         }
         //Добавление реакции Х к сообщению от бота.
-        if (event.getMember().getUser().isBot() &&
-                event.getMessage().getContentDisplay().equals("") && reaction) {
+        if (reaction & event.getMember().getUser().isBot() &&
+                event.getMessage().getContentDisplay().equals("")) {
             users.put(event.getMessage().getId(), user);
             event.getMessage().addReaction("❌").queue();
             reaction = false;
@@ -55,7 +55,7 @@ public class Information extends ListenerAdapter {
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
-        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &&
+        if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &
                 event.getReactionEmote().getName().equals("❌") &&
                 !event.getUser().isBot()) {
             //проверка нужна, чтобы не было краша после перезапуска программы с уже вызванной до этого командой, когда удаление будет делаться с пустой HashMap.
@@ -68,7 +68,7 @@ public class Information extends ListenerAdapter {
                 users.remove(event.getMessageId());
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             } else {
-                if(!event.getUser().isBot()) event.getReaction().removeReaction().queue();
+                if(!event.getUser().isBot()) event.getReaction().removeReaction(event.getUser()).queue();
             }
         }
     }
