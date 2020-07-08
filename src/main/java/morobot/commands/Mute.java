@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
@@ -24,16 +23,26 @@ public class Mute extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
+                if (!args[1].startsWith("<@")) incorrectCommandExceptionEmbed(event);
                 //Команда без счетчика времени.
-                if (args.length == 2 && args[1].startsWith("<@")) {
-                    muteWithoutTimeSchedule(event, args);
-                }
+                if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
                 //Команда со счетчиком времени.
-                if (args.length == 3 && args[1].startsWith("<@")) {
-                    muteWithTimeSchedule(event, args);
-                }
+                if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
             }
         }
+    }
+
+    private void incorrectCommandExceptionEmbed(GuildMessageReceivedEvent event) {
+        event.getMessage().delete().queue();
+        EmbedBuilder incorrectTime = new EmbedBuilder();
+        incorrectTime.setColor(0xf2480a);
+        incorrectTime.setDescription("Команда \"mute\" написана некорректно.\n" +
+                "Используй: " + App.prefix + "mute [user] [time (optional, min)]");
+        event.getChannel().sendMessage(incorrectTime.build())
+                .delay(5, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
+        incorrectTime.clear();
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -45,12 +54,19 @@ public class Mute extends ListenerAdapter {
             Role role = event.getGuild().getRoleById("730486590870126623");
             if (!member.getRoles().contains(role)) {
                 try {
-                    if (member.hasPermission(Permission.MANAGE_ROLES)) hierarchyExceptionEmbed(event);
-                    int time = Integer.parseInt(args[2]);
-                    event.getGuild().addRoleToMember(id, role).queue();
-                    //Таймер
-                    startTimer(event, time, role);
-                    roleAddEmbed(event, time);
+                    if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
+                            member.hasPermission(Permission.ADMINISTRATOR)) { //Только администратор может отстранить любого, кроме администратора.
+                        hierarchyExceptionEmbed(event); //Пользователь с правами ролей не сможет отстранить никого старше себя.
+                    } else {
+                        int time = Integer.parseInt(args[2]);
+                        if (time <= 0) {
+                            incorrectTimeExceptionEmbed(event);
+                        } else {
+                            event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
+                            startTimer(event, time, role); //Таймер
+                            roleAddEmbed(event, time); //Сообщение об отстранении пользователя
+                        }
+                    }
                 } catch (NumberFormatException e) {
                     incorrectTimeExceptionEmbed(event);
                 } catch (IllegalArgumentException e) {
@@ -72,7 +88,7 @@ public class Mute extends ListenerAdapter {
                     roleRemovedEmbed(event, member);
                 }
             }
-        }, time * 60000);
+        }, time * 60000); //Время отстранения указывается в минутах
     }
 
     private void muteWithoutTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -83,12 +99,12 @@ public class Mute extends ListenerAdapter {
         if (member != null) {
             Role role = event.getGuild().getRoleById("730486590870126623");
             if (!member.getRoles().contains(role)) {
-                try {
-                    if (member.hasPermission(Permission.MANAGE_ROLES)) throw new HierarchyException("");
-                    event.getGuild().addRoleToMember(id, role).queue();
-                    roleAddEmbed(event);
-                } catch (HierarchyException e) {
-                    hierarchyExceptionEmbed(event);
+                if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
+                        member.hasPermission(Permission.ADMINISTRATOR)) { //Только администратор может отстранить любого, кроме администратора.
+                    hierarchyExceptionEmbed(event); //Пользователь с правами ролей не сможет отстранить никого старше себя.
+                } else {
+                    event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
+                    roleAddEmbed(event); //Сообщение об отстранении пользователя
                 }
             } else alreadyMutedExceptionEmbed(event);
         } else noMemberExceptionEmbed(event);
@@ -166,9 +182,10 @@ public class Mute extends ListenerAdapter {
         EmbedBuilder incorrectTime = new EmbedBuilder();
         incorrectTime.setColor(0xf2480a);
         incorrectTime.setDescription("Указано некорректное время отстранения\n" +
-                "Используй: " + App.prefix + "mute [user] [time (min)]");
+                "Используй: " + App.prefix + "mute [user] [time (optional, min)]\n" +
+                "Время отстранения, при этом, может быть [1 - 35791] минут.");
         event.getChannel().sendMessage(incorrectTime.build())
-                .delay(5, TimeUnit.SECONDS)
+                .delay(7, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
         incorrectTime.clear();
