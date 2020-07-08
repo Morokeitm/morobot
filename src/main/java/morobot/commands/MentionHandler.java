@@ -1,7 +1,7 @@
-package morobot.Commands;
+package morobot.commands;
 
-import morobot.Users.AnyaLiv;
-import morobot.Users.Strelok;
+import morobot.users.AnyaLiv;
+import morobot.users.Strelok;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 

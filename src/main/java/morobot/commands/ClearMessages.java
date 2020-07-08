@@ -1,4 +1,4 @@
-package morobot.Commands;
+package morobot.commands;
 
 import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;

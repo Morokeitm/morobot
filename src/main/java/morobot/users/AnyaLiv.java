@@ -1,15 +1,14 @@
-package morobot.Users;
+package morobot.users;
 
 import morobot.TripleMention;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-public class Strelok extends TripleMention {
-    private static String[] args = {"стрелок", "диана", "strelok", "диане", "диану", "дианой", "стрелка", "стрелку", "стрелке", "дианы"};
-    private static final String NAME = "STRELOK";
+public class AnyaLiv extends TripleMention {
+    private static String[] args = {"аня", "анна", "anyaliv", "анялив", "ане", "аню", "аней", "ани", "анилив", "анюлив", "анейлив"};
+    private static final String NAME = "AnyaLiv";
     private static int count = 0;
     private static long startTime;
     private static long endTime;

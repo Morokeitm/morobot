@@ -1,4 +1,4 @@
-package morobot.Commands;
+package morobot.commands;
 
 import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -67,6 +67,8 @@ public class Information extends ListenerAdapter {
             if (event.getUser().equals(users.get(event.getMessageId()))) {
                 users.remove(event.getMessageId());
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
+            } else {
+                if(!event.getUser().isBot()) event.getReaction().removeReaction().queue();
             }
         }
     }

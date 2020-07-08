@@ -1,11 +1,13 @@
-package morobot.Commands;
+package morobot.commands;
 
 import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
@@ -33,10 +35,12 @@ public class ShowAvatar extends ListenerAdapter {
                 } else if (args.length == 2) {
                     // если хочет посмотреть чей-то аватар.
                     // проверяем, упомянут ли пользователь через @User.
-                    if (args[1].startsWith("<@!")) {
-                        String id = args[1].replace("<@!", "").replace(">", "");
-                        User mentionedUser = event.getJDA().getUserById(id);
-                        if ((imageUrl = mentionedUser.getAvatarUrl()) != null) {
+                    if (args[1].startsWith("<@")) {
+                        String id = args[1].startsWith("<@!") ?
+                                args[1].replace("<@!", "").replace(">", "") :
+                                args[1].replace("<@", "").replace(">", "");
+                        Member member = event.getGuild().getMemberById(id);
+                        if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
                             sendImage(event, imageUrl);
                         } else {
                             event.getChannel().sendMessage("У этого пользователя нет картинки на аватаре.").queue();
