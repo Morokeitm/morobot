@@ -2,6 +2,7 @@ package morobot.commands;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -12,6 +13,8 @@ import java.util.Map;
 public class XReaction extends ListenerAdapter {
 
     static Map<String, User> usersUsedCommand = new HashMap<>();
+    static boolean reaction = false;
+    static User user = null;
 
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
@@ -31,6 +34,15 @@ public class XReaction extends ListenerAdapter {
             } else {
                 if(!event.getUser().isBot()) event.getReaction().removeReaction(event.getUser()).queue();
             }
+        }
+    }
+
+    public static void addReaction(GuildMessageReceivedEvent event) {
+        if (reaction && event.getMember().getUser().isBot() &&
+                event.getMessage().getContentDisplay().equals("")) {
+            XReaction.usersUsedCommand.put(event.getMessage().getId(), user);
+            event.getMessage().addReaction("❌").queue();
+            reaction = false;
         }
     }
 }

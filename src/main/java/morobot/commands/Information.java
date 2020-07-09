@@ -3,7 +3,6 @@ package morobot.commands;
 import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -11,17 +10,13 @@ import javax.annotation.Nonnull;
 
 public class Information extends ListenerAdapter {
 
-    private static boolean reaction = false;
-    private static User user;
-//    private static Map <String, User> users = new HashMap<>();
-
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         String[] args = event.getMessage().getContentRaw().split("\\s+");
         if (!event.getAuthor().isBot()) {
             if (args[0].equalsIgnoreCase(App.prefix + "info")) {
-                user = event.getAuthor();
-                reaction = true;
+                XReaction.user = event.getAuthor();
+                XReaction.reaction = true;
                 event.getMessage().delete().queue();
                 EmbedBuilder info = new EmbedBuilder();
                 info.setTitle("~ Информация о боте ~");
@@ -46,16 +41,6 @@ public class Information extends ListenerAdapter {
             }
         }
         //Добавление реакции Х к сообщению от бота.
-        addReaction(event);
-    }
-
-    private void addReaction(GuildMessageReceivedEvent event) {
-        if (reaction && event.getMember().getUser().isBot() &&
-                event.getMessage().getContentDisplay().equals("")) {
-            XReaction.usersUsedCommand.put(event.getMessage().getId(), user);
-            event.getMessage().addReaction("❌").queue();
-            reaction = false;
-            user = null;
-        }
+        XReaction.addReaction(event);
     }
 }
