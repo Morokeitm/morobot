@@ -187,7 +187,6 @@ public class Mute extends ListenerAdapter {
     }
 
     private void roleRemovedEmbed(GuildMessageReceivedEvent event, Member member) {
-        event.getMessage().delete().queue();
         EmbedBuilder removeRole = new EmbedBuilder();
         removeRole.setColor(0x14f51b);
         removeRole.setTitle("Отстранение снято:");
