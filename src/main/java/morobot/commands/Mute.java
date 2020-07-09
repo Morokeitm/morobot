@@ -17,32 +17,29 @@ import java.util.concurrent.TimeUnit;
 public class Mute extends ListenerAdapter {
 
     private static Member member;
+    private String errorDescription;
+    private static final String MUTE_ROLE = "730486590870126623";
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
-                if (!args[1].startsWith("<@")) incorrectCommandExceptionEmbed(event);
-                //Команда без счетчика времени.
-                if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
-                //Команда со счетчиком времени.
-                if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
+                if (args.length > 1 && args.length < 4) {
+                    if (!args[1].startsWith("<@")) {
+                        errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
+                        errorExceptionEmbed(event, errorDescription);
+                    }
+                    //Команда без счетчика времени.
+                    if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
+                    //Команда со счетчиком времени.
+                    if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
+                } else {
+                    errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
+                    errorExceptionEmbed(event, errorDescription);
+                }
             }
         }
-    }
-
-    private void incorrectCommandExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder incorrectTime = new EmbedBuilder();
-        incorrectTime.setColor(0xf2480a);
-        incorrectTime.setDescription("Команда \"mute\" написана некорректно.\n" +
-                "Используй: " + App.prefix + "mute [user] [time (optional, min)]");
-        event.getChannel().sendMessage(incorrectTime.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        incorrectTime.clear();
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -51,31 +48,43 @@ public class Mute extends ListenerAdapter {
                 args[1].replace("<@", "").replace(">", "");
         member = event.getGuild().getMemberById(id);
         if (member != null) {
-            Role role = event.getGuild().getRoleById("730486590870126623");
+            Role role = event.getGuild().getRoleById(MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
                 try {
-                    if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
-                            member.hasPermission(Permission.ADMINISTRATOR)) { //Только администратор может отстранить любого, кроме администратора.
-                        hierarchyExceptionEmbed(event); //Пользователь с правами ролей не сможет отстранить никого старше себя.
-                    } else {
-                        int time = Integer.parseInt(args[2]);
-                        if (time <= 0) {
-                            incorrectTimeExceptionEmbed(event);
-                        } else {
-                            event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
-                            startTimer(event, time, role); //Таймер
-                            roleAddEmbed(event, time); //Сообщение об отстранении пользователя
-                        }
-                    }
+                    muteWithTimeScheduleDependOnPermissions(event, member, role, args[2], id);
                 } catch (NumberFormatException e) {
                     incorrectTimeExceptionEmbed(event);
                 } catch (IllegalArgumentException e) {
-                    tooLongTimeExceptionEmbed(event);
+                    errorDescription = "Указано слишком большое время отстранения.\nОно не будет снято автоматически.";
+                    errorExceptionEmbed(event, errorDescription);
                 }
             } else {
-                alreadyMutedExceptionEmbed(event);
+                errorDescription = member.getUser().getName() + " уже отстранен.";
+                errorExceptionEmbed(event, errorDescription);
             }
-        } else noMemberExceptionEmbed(event);
+        } else {
+            errorDescription = "Не могу найти этого пользователя на сервере :(";
+            errorExceptionEmbed(event, errorDescription);
+        }
+    }
+
+    private void muteWithTimeScheduleDependOnPermissions(GuildMessageReceivedEvent event, Member member, Role role, String muteTime, String id) {
+        /*Только администратор сможет отстранить любого пользователя, кроме администратора.
+        Пользователь с правами ролей не сможет отстранить никого старше себя.*/
+        if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
+                member.hasPermission(Permission.ADMINISTRATOR)) {
+            errorDescription = "Невозможно отстранить " + member.getUser().getName();
+            errorExceptionEmbed(event , errorDescription);
+        } else {
+            int time = Integer.parseInt(muteTime);
+            if (time <= 0) {
+                incorrectTimeExceptionEmbed(event);
+            } else {
+                event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
+                startTimer(event, time, role); //Таймер
+                roleAddEmbed(event, time); //Сообщение об отстранении пользователя
+            }
+        }
     }
 
     private void startTimer(GuildMessageReceivedEvent event, int time, Role role) {
@@ -97,31 +106,30 @@ public class Mute extends ListenerAdapter {
                 args[1].replace("<@", "").replace(">", "");
         member = event.getGuild().getMemberById(id);
         if (member != null) {
-            Role role = event.getGuild().getRoleById("730486590870126623");
+            Role role = event.getGuild().getRoleById(MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
-                if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
-                        member.hasPermission(Permission.ADMINISTRATOR)) { //Только администратор может отстранить любого, кроме администратора.
-                    hierarchyExceptionEmbed(event); //Пользователь с правами ролей не сможет отстранить никого старше себя.
-                } else {
-                    event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
-                    roleAddEmbed(event); //Сообщение об отстранении пользователя
-                }
-            } else alreadyMutedExceptionEmbed(event);
-        } else noMemberExceptionEmbed(event);
+                muteDependOnPermissions(event, member, role, id);
+            } else {
+                errorDescription = member.getUser().getName() + " уже отстранен.";
+                errorExceptionEmbed(event, errorDescription);
+            }
+        } else {
+            errorDescription = "Не могу найти этого пользователя на сервере :(";
+            errorExceptionEmbed(event, errorDescription);
+        }
     }
 
-    private void tooLongTimeExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder incorrectTime = new EmbedBuilder();
-        incorrectTime.setColor(0xf2480a);
-        incorrectTime.setDescription("Указано слишком большое время отстранения.\n" +
-                "Оно не будет снято автоматически.");
-        event.getChannel().sendMessage(incorrectTime.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        incorrectTime.clear();
-        member = null;
+    private void muteDependOnPermissions(GuildMessageReceivedEvent event, Member member, Role role, String id) {
+        /*Только администратор сможет отстранить любого пользователя, кроме администратора.
+        Пользователь с правами ролей не сможет отстранить никого старше себя.*/
+        if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
+                member.hasPermission(Permission.ADMINISTRATOR)) {
+            errorDescription = "Невозможно отстранить " + member.getUser().getName();
+            errorExceptionEmbed(event, errorDescription);
+        } else {
+            event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
+            roleAddEmbed(event); //Сообщение об отстранении пользователя
+        }
     }
 
     private void roleAddEmbed(GuildMessageReceivedEvent event) {
@@ -143,19 +151,16 @@ public class Mute extends ListenerAdapter {
         String timeText = "";
         if (time < 60) timeText = "Минут: " + time;
         if (time >= 60 && time <1440) {
-            timeText = "Часов: " + time/60 + "\n" +
-                    "Минут: " + time%60;
+            timeText = "Часов: " + time/60 + ", Минут: " + time%60;
         }
         if (time >= 1440) {
-            timeText = "Дней: " + time/1440 + "\n" +
-            "Часов: " + (time%1440)/60 + "\n" +
-            "Минут: " + (time%1440)%60;
+            timeText = "Дней: " + time/1440 + ", Часов: " + (time%1440)/60 + ", Минут: " + (time%1440)%60;
         }
         EmbedBuilder succeed = new EmbedBuilder();
         succeed.setColor(0xfcba03);
         succeed.setTitle("Отстранение:");
         succeed.setDescription(member.getUser().getName());
-        succeed.addField("Время:", timeText, false);
+        succeed.addField("Время:", timeText, true);
         event.getChannel().sendMessage(succeed.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
@@ -192,41 +197,16 @@ public class Mute extends ListenerAdapter {
         member = null;
     }
 
-    private void hierarchyExceptionEmbed(GuildMessageReceivedEvent event) {
+    private void errorExceptionEmbed(GuildMessageReceivedEvent event, String description) {
         event.getMessage().delete().queue();
-        EmbedBuilder hierarchy = new EmbedBuilder();
-        hierarchy.setColor(0xf2480a);
-        hierarchy.setDescription("Невозможно отстранить " + member.getUser().getName());
-        event.getChannel().sendMessage(hierarchy.build())
+        EmbedBuilder error = new EmbedBuilder();
+        error.setColor(0xf2480a);
+        error.setDescription(description);
+        event.getChannel().sendMessage(error.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
-        hierarchy.clear();
-        member = null;
-    }
-
-    private void noMemberExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder noMember = new EmbedBuilder();
-        noMember.setColor(0xf2480a);
-        noMember.setDescription("Не могу найти этого пользователя на сервере :(");
-        event.getChannel().sendMessage(noMember.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        noMember.clear();
-    }
-
-    private void alreadyMutedExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder muted = new EmbedBuilder();
-        muted.setColor(0xf2480a);
-        muted.setDescription(member.getUser().getName() + " уже отстранен.");
-        event.getChannel().sendMessage(muted.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        muted.clear();
+        error.clear();
         member = null;
     }
 }
