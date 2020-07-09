@@ -30,7 +30,10 @@ public class Mute extends ListenerAdapter {
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
                 user = event.getAuthor();
                 reaction = true;
-                if (args.length > 1 && args.length < 4) {
+                if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+                    errorDescription = "У тебя нет прав на добавление ролей.";
+                    errorExceptionEmbed(event, errorDescription);
+                } else if (args.length > 1 && args.length < 4) {
                     if (!args[1].startsWith("<@")) {
                         errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
                         errorExceptionEmbed(event, errorDescription);
