@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -16,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Mute extends ListenerAdapter {
 
+    private static boolean reaction = false;
+    private static User user;
     private static Member member;
     private String errorDescription;
     private static final String MUTE_ROLE = "730486590870126623";
@@ -25,6 +28,8 @@ public class Mute extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
+                user = event.getAuthor();
+                reaction = true;
                 if (args.length > 1 && args.length < 4) {
                     if (!args[1].startsWith("<@")) {
                         errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
@@ -40,6 +45,8 @@ public class Mute extends ListenerAdapter {
                 }
             }
         }
+        //Добавление реакции Х к сообщению от бота.
+        addReaction(event);
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -53,9 +60,7 @@ public class Mute extends ListenerAdapter {
                 try {
                     muteWithTimeScheduleDependOnPermissions(event, member, role, args[2], id);
                 } catch (NumberFormatException e) {
-                    incorrectTimeExceptionEmbed(event);
-                } catch (IllegalArgumentException e) {
-                    errorDescription = "Указано слишком большое время отстранения.\nОно не будет снято автоматически.";
+                    errorDescription = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 35791] минут.";
                     errorExceptionEmbed(event, errorDescription);
                 }
             } else {
@@ -78,11 +83,19 @@ public class Mute extends ListenerAdapter {
         } else {
             int time = Integer.parseInt(muteTime);
             if (time <= 0) {
-                incorrectTimeExceptionEmbed(event);
+                errorDescription = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 35791] минут.";
+                errorExceptionEmbed(event, errorDescription);
             } else {
-                event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
-                startTimer(event, time, role); //Таймер
-                roleAddEmbed(event, time); //Сообщение об отстранении пользователя
+                if (time > 34560) {
+                    errorDescription = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 35791] минут.";
+                    errorExceptionEmbed(event, errorDescription);
+                } else {
+                    startTimer(event, time, role); //Таймер
+                    reaction = false;
+                    user = null;
+                    event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
+                    roleAddEmbed(event, time); //Сообщение об отстранении пользователя
+                }
             }
         }
     }
@@ -105,6 +118,8 @@ public class Mute extends ListenerAdapter {
                 args[1].replace("<@!", "").replace(">", "") :
                 args[1].replace("<@", "").replace(">", "");
         member = event.getGuild().getMemberById(id);
+        user = event.getAuthor();
+        reaction = true;
         if (member != null) {
             Role role = event.getGuild().getRoleById(MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
@@ -127,6 +142,8 @@ public class Mute extends ListenerAdapter {
             errorDescription = "Невозможно отстранить " + member.getUser().getName();
             errorExceptionEmbed(event, errorDescription);
         } else {
+            reaction = false;
+            user = null;
             event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
             roleAddEmbed(event); //Сообщение об отстранении пользователя
         }
@@ -182,31 +199,26 @@ public class Mute extends ListenerAdapter {
         removeRole.clear();
     }
 
-    private void incorrectTimeExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder incorrectTime = new EmbedBuilder();
-        incorrectTime.setColor(0xf2480a);
-        incorrectTime.setDescription("Указано некорректное время отстранения\n" +
-                "Используй: " + App.prefix + "mute [user] [time (optional, min)]\n" +
-                "Время отстранения, при этом, может быть [1 - 35791] минут.");
-        event.getChannel().sendMessage(incorrectTime.build())
-                .delay(7, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        incorrectTime.clear();
-        member = null;
-    }
-
     private void errorExceptionEmbed(GuildMessageReceivedEvent event, String description) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
         error.setDescription(description);
         event.getChannel().sendMessage(error.build())
-                .delay(5, TimeUnit.SECONDS)
+                .delay(15, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
         error.clear();
         member = null;
+    }
+
+    private void addReaction(GuildMessageReceivedEvent event) {
+        if (reaction && event.getMember().getUser().isBot() &&
+                event.getMessage().getContentDisplay().equals("")) {
+            XReaction.usersUsedCommand.put(event.getMessage().getId(), user);
+            event.getMessage().addReaction("❌").queue();
+            reaction = false;
+            user = null;
+        }
     }
 }

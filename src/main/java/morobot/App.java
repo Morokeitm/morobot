@@ -23,5 +23,6 @@ public class App {
         builder.addEventListener(new MentionHandler()); //Поверка упоминания отдельных пользователей.
         builder.addEventListener(new ShowAvatar()); //Команда отображения аватара.
         builder.addEventListener(new Mute()); //Команда выдачи роли мута (Код роли у каждого сервера разный).
+        builder.addEventListener(new XReaction());
     }
 }
