@@ -1,7 +1,7 @@
 package morobot.commands;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -17,30 +17,34 @@ public class XReaction extends ListenerAdapter {
     static {
         load();
     }
-
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
         if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE) &&
                 event.getReactionEmote().getName().equals("❌") &&
                 !event.getUser().isBot() && usersUsedCommand.containsKey(event.getMessageId())) {
-            //проверка нужна, чтобы не было краша после перезапуска программы с уже вызванной до этого командой, когда удаление будет делаться с пустой HashMap.
-            deleteAndSave(event);
             event.getChannel().deleteMessageById(event.getMessageId()).queue();
-        }
-        if(event.getReactionEmote().getName().equals("❌") &&
+        } else if(event.getReactionEmote().getName().equals("❌") &&
                 usersUsedCommand.containsKey(event.getMessageId())) {
             if (event.getMember().getId().equals(usersUsedCommand.get(event.getMessageId()))) {
-                deleteAndSave(event);
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             } else {
                 if(!event.getUser().isBot()) event.getReaction().removeReaction(event.getUser()).queue();
             }
         }
     }
+
+    @Override
+    public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
+        String message = event.getMessageId();
+        if (usersUsedCommand.containsKey(message)) {
+            deleteAndSave(message);
+        }
+    }
+
     //Сохранение и запись событий, чтобы перезагрузка программы не нарушала логику работы с предыдущими сообщениями.
-    private static void deleteAndSave(GuildMessageReactionAddEvent event) {
-        usersUsedCommand.remove(event.getMessageId());
+    private static void deleteAndSave(String message) {
+        usersUsedCommand.remove(message);
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
             oos.writeObject(usersUsedCommand);
             System.out.println(XReaction.usersUsedCommand);
