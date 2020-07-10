@@ -3,8 +3,10 @@ package morobot.commands;
 import morobot.App;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 
 import javax.annotation.Nonnull;
 
@@ -13,10 +15,8 @@ public class Information extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         String[] args = event.getMessage().getContentRaw().split("\\s+");
-        if (!event.getAuthor().isBot()) {
+        if (!event.getAuthor().isBot() && event.getMember() != null) {
             if (args[0].equalsIgnoreCase(App.prefix + "info")) {
-                XReaction.user = event.getAuthor();
-                XReaction.reaction = true;
                 event.getMessage().delete().queue();
                 EmbedBuilder info = new EmbedBuilder();
                 info.setTitle("~ Информация о боте ~");
@@ -36,11 +36,15 @@ public class Information extends ListenerAdapter {
                 }
                 info.setFooter("Developed by Morokei_tm", "https://cdn.discordapp.com/avatars/319137115139080192/27b8ae9889feb379950af141841d48b4.png");
                 info.setColor(0x2374de);
-                event.getChannel().sendMessage(info.build()).queue();
+                //Добавляем реакцию ❌ к сообщению
+                RestAction<Message> action = event.getChannel().sendMessage(info.build());
+                action.queue(message -> {
+                    message.addReaction("❌").queue();
+                    XReaction.putAndSave(message.getId(), event.getAuthor());
+                    System.out.println(XReaction.usersUsedCommand);
+                });
                 info.clear();
             }
         }
-        //Добавление реакции Х к сообщению от бота.
-        XReaction.addReaction(event);
     }
 }

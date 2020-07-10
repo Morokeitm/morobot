@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 
 import javax.annotation.Nonnull;
 import java.util.Timer;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class Mute extends ListenerAdapter {
 
     private static Member member;
+    private static String id;
     private String errorDescription;
     private static final String MUTE_ROLE = "730486590870126623";
 
@@ -25,8 +27,6 @@ public class Mute extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
-                XReaction.user = event.getAuthor();
-                XReaction.reaction = true;
                 if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
                     errorDescription = "У тебя нет прав на добавление ролей.";
                     errorExceptionEmbed(event, errorDescription);
@@ -45,15 +45,17 @@ public class Mute extends ListenerAdapter {
                 }
             }
         }
-        //Добавление реакции Х к сообщению от бота.
-        XReaction.addReaction(event);
+    }
+
+    private void findMemberById(GuildMessageReceivedEvent event, String arg) {
+        id = arg.startsWith("<@!") ?
+                arg.replace("<@!", "").replace(">", "") :
+                arg.replace("<@", "").replace(">", "");
+        member = event.getGuild().getMemberById(id);
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
-        String id = args[1].startsWith("<@!") ?
-                args[1].replace("<@!", "").replace(">", "") :
-                args[1].replace("<@", "").replace(">", "");
-        member = event.getGuild().getMemberById(id);
+        findMemberById(event, args[1]);
         if (member != null) {
             Role role = event.getGuild().getRoleById(MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
@@ -91,8 +93,6 @@ public class Mute extends ListenerAdapter {
                     errorExceptionEmbed(event, errorDescription);
                 } else {
                     startTimer(event, time, role); //Таймер
-                    XReaction.user = null;
-                    XReaction.reaction = false;
                     event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
                     roleAddEmbed(event, time); //Сообщение об отстранении пользователя
                 }
@@ -114,12 +114,9 @@ public class Mute extends ListenerAdapter {
     }
 
     private void muteWithoutTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
-        String id = args[1].startsWith("<@!") ?
-                args[1].replace("<@!", "").replace(">", "") :
-                args[1].replace("<@", "").replace(">", "");
-        member = event.getGuild().getMemberById(id);
-        XReaction.user = event.getAuthor();
-        XReaction.reaction = true;
+        findMemberById(event, args[1]);
+//        XReaction.user = event.getAuthor();
+//        XReaction.reaction = true;
         if (member != null) {
             Role role = event.getGuild().getRoleById(MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
@@ -142,8 +139,6 @@ public class Mute extends ListenerAdapter {
             errorDescription = "Невозможно отстранить " + member.getUser().getName();
             errorExceptionEmbed(event, errorDescription);
         } else {
-            XReaction.user = null;
-            XReaction.reaction = false;
             event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
             roleAddEmbed(event); //Сообщение об отстранении пользователя
         }
@@ -203,10 +198,13 @@ public class Mute extends ListenerAdapter {
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
         error.setDescription(description);
-        event.getChannel().sendMessage(error.build())
-                .delay(15, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
+        RestAction<Message> action = event.getChannel().sendMessage(error.build());
+        action.queue((message) -> {
+            //Добавляем реакцию ❌ к сообщению об ошибке
+            message.addReaction("❌").queue();
+            XReaction.putAndSave(message.getId(), event.getAuthor());
+            message.delete().queueAfter(15, TimeUnit.SECONDS);
+        });
         error.clear();
         member = null;
     }
