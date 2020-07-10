@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class XReaction extends ListenerAdapter {
 
+    private static final String FILE_NAME = "logs.dat";
     public static Map<String, String> usersUsedCommand = new HashMap<>();
     static {
         load();
@@ -51,9 +52,9 @@ public class XReaction extends ListenerAdapter {
     //Сохранение и запись событий, чтобы перезагрузка программы не нарушала логику работы с предыдущими сообщениями.
     private static void deleteAndSave(String message) {
         usersUsedCommand.remove(message);
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(usersUsedCommand);
-            System.out.println(XReaction.usersUsedCommand);
+            System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);
         }
         catch(Exception ex) {
             System.out.println(ex.getMessage());
@@ -62,9 +63,9 @@ public class XReaction extends ListenerAdapter {
 
     public static void putAndSave (String id, String author) {
         usersUsedCommand.put(id, author);
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(usersUsedCommand);
-            System.out.println(XReaction.usersUsedCommand);
+            System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);
         }
         catch(Exception ex) {
             System.out.println(ex.getMessage());
@@ -72,12 +73,10 @@ public class XReaction extends ListenerAdapter {
     }
 
     private static void load () {
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream("logs.dat"))) {
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             Map<String, String> checkMap;
-            if ((checkMap = (Map<String, String>) ois.readObject()) != null) {
-                usersUsedCommand = checkMap;
-            }
-            System.out.println(XReaction.usersUsedCommand);
+            if ((checkMap = (Map<String, String>) ois.readObject()) != null) usersUsedCommand = checkMap;
+            System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

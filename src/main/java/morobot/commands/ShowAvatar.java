@@ -12,12 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 public class ShowAvatar extends ListenerAdapter {
 
-    private static final String NO_AVATAR = "У пользователя отсутствует картинка на аватаре.";
-    private static final String CANT_FIND_MEMBER = "Не могу найти этого пользователя на сервере :(";
-    private static final String NO_SELF_AVATAR = "У тебя нет картинки на аватаре, что я тебе показать должен?";
-    private static final String USAGE = "Используй: " + App.prefix + "avatar @User";
-    private static final String NEED_TO_MENTION= "Нужно упомянуть пользователя";
-
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         if (!event.getAuthor().isBot()) {
@@ -42,14 +36,14 @@ public class ShowAvatar extends ListenerAdapter {
         if (user.startsWith("<@")) {
             Member member = findMember(event, user);
             if (member == null) {
-                errorEmbed(event, CANT_FIND_MEMBER, null);
+                errorEmbed(event, Constants.CANT_FIND_MEMBER, null);
             } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
                 sendImageEmbed(event, imageUrl);
             } else {
-                errorEmbed(event, NO_AVATAR, null);
+                errorEmbed(event, Constants.NO_AVATAR, null);
             }
         } else {
-            errorEmbed(event, NEED_TO_MENTION, USAGE);
+            errorEmbed(event, Constants.NEED_TO_MENTION, Constants.COMMAND_USAGE);
         }
     }
 
@@ -58,7 +52,7 @@ public class ShowAvatar extends ListenerAdapter {
         if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
             sendImageEmbed(event, imageUrl);
         } else {
-            errorEmbed(event, NO_SELF_AVATAR, null);
+            errorEmbed(event, Constants.NO_SELF_AVATAR, null);
         }
     }
 

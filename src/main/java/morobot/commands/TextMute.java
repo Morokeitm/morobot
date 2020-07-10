@@ -16,17 +16,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class Mute extends ListenerAdapter {
+public class TextMute extends ListenerAdapter {
 
     private static Member member;
     private static String id;
     private String errorDescription;
-    private static final String MUTE_ROLE = "730486590870126623";
-    private static final String WRONG_COMMAND = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
-    private static final String NO_PERMISSIONS = "У тебя нет прав на добавление ролей.";
-    private static final String CANT_FIND_USER = "Не могу найти этого пользователя на сервере :(";
-    private static final String TOO_BIG_MUTE_TIME = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 34560] минут.";
-    private static final String WRONG_MUTE_TIME = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
@@ -38,17 +32,17 @@ public class Mute extends ListenerAdapter {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             if (!author.isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
                 if (!member.hasPermission(Permission.MANAGE_ROLES)) {
-                    errorEmbed(event, NO_PERMISSIONS);
+                    errorEmbed(event, Constants.NO_PERMISSIONS);
                 } else if (args.length > 1 && args.length < 4) {
                     if (!args[1].startsWith("<@")) {
-                        errorEmbed(event, WRONG_COMMAND);
+                        errorEmbed(event, Constants.WRONG_COMMAND);
                     }
                     //Команда без счетчика времени.
                     if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
                     //Команда со счетчиком времени.
                     if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
                 } else {
-                    errorEmbed(event, WRONG_COMMAND);
+                    errorEmbed(event, Constants.WRONG_COMMAND);
                 }
             }
         }
@@ -64,19 +58,19 @@ public class Mute extends ListenerAdapter {
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
         findMemberById(event, args[1]);
         if (member != null) {
-            Role role = event.getGuild().getRoleById(MUTE_ROLE);
+            Role role = event.getGuild().getRoleById(Constants.MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
                 try {
                     muteWithTimeScheduleDependOnPermissions(event, member, role, args[2], id);
                 } catch (NumberFormatException e) {
-                    errorEmbed(event, WRONG_MUTE_TIME);
+                    errorEmbed(event, Constants.WRONG_MUTE_TIME);
                 }
             } else {
                 errorDescription = member.getUser().getName() + " уже отстранен.";
                 errorEmbed(event, errorDescription);
             }
         } else {
-            errorEmbed(event, CANT_FIND_USER);
+            errorEmbed(event, Constants.CANT_FIND_USER);
         }
     }
 
@@ -90,10 +84,10 @@ public class Mute extends ListenerAdapter {
         } else {
             int time = Integer.parseInt(muteTime);
             if (time <= 0) {
-                errorEmbed(event, WRONG_MUTE_TIME);
+                errorEmbed(event, Constants.WRONG_MUTE_TIME);
             } else {
                 if (time > 34560) {
-                    errorEmbed(event, TOO_BIG_MUTE_TIME);
+                    errorEmbed(event, Constants.TOO_BIG_MUTE_TIME);
                 } else {
                     startTimer(event, time, role); //Таймер
                     event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
@@ -105,7 +99,7 @@ public class Mute extends ListenerAdapter {
 
     private void startTimer(GuildMessageReceivedEvent event, int time, Role role) {
         new Timer().schedule(new TimerTask() {
-            Member member = Mute.member;
+            Member member = TextMute.member;
             @Override
             public void run() {
                 if (member.getRoles().contains(role)) {
@@ -121,7 +115,7 @@ public class Mute extends ListenerAdapter {
 //        XReaction.user = event.getAuthor();
 //        XReaction.reaction = true;
         if (member != null) {
-            Role role = event.getGuild().getRoleById(MUTE_ROLE);
+            Role role = event.getGuild().getRoleById(Constants.MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
                 muteDependOnPermissions(event, member, role, id);
             } else {
@@ -129,7 +123,7 @@ public class Mute extends ListenerAdapter {
                 errorEmbed(event, errorDescription);
             }
         } else {
-            errorEmbed(event, CANT_FIND_USER);
+            errorEmbed(event, Constants.CANT_FIND_USER);
         }
     }
 

@@ -9,14 +9,14 @@ import javax.annotation.Nonnull;
 
 public class MentionHandler extends ListenerAdapter {   //Обязательно наследуемся от ListenerAdapter для обработки сообщений
 
-    private static AnyaLiv anyaLiv = new AnyaLiv();
-    private static Strelok strelok = new Strelok();
+//    private static AnyaLiv anyaLiv = new AnyaLiv();
+//    private static Strelok strelok = new Strelok();
 
-    @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {  //event - ообщение, оставленное кем-то.
-        if (!event.getAuthor().isBot()) {
-            anyaLiv.checkMention(event);
-            strelok.checkMention(event);
-        }
-    }
+//    @Override
+//    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {  //event - ообщение, оставленное кем-то.
+//        if (!event.getAuthor().isBot()) {
+//            anyaLiv.checkMention(event);
+//            strelok.checkMention(event);
+//        }
+//    }
 }
