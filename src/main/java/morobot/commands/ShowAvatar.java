@@ -12,7 +12,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ShowAvatar extends ListenerAdapter {
 
-    private EmbedBuilder image = new EmbedBuilder();
+    private static final String NO_AVATAR = "У пользователя отсутствует картинка на аватаре.";
+    private static final String CANT_FIND_MEMBER = "Не могу найти этого пользователя на сервере :(";
+    private static final String NO_SELF_AVATAR = "У тебя нет картинки на аватаре, что я тебе показать должен?";
+    private static final String USAGE = "Используй: " + App.prefix + "avatar @User";
+    private static final String NEED_TO_MENTION= "Нужно упомянуть пользователя";
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
@@ -20,92 +24,70 @@ public class ShowAvatar extends ListenerAdapter {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             // проверяем, является ли сообщение командой .avatar.
             if (args[0].equalsIgnoreCase(App.prefix + "avatar")) {
-                String imageUrl;
                 if (args.length == 1) {
                     /*если хочет посмотреть свой аватар.
                      проверяем есть ли аватар у пользователя*/
-                    if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
-                        sendImageEmbed(event, imageUrl);
-                    } else {
-                        noAvatarExceptionEmbed(event);
-                    }
+                    showSelfAvatar(event);
                 } else if (args.length == 2) {
                     /* если хочет посмотреть чей-то аватар.
                      проверяем, упомянут ли пользователь через @User.*/
-                    if (args[1].startsWith("<@")) {
-                        String id = args[1].startsWith("<@!") ?
-                                args[1].replace("<@!", "").replace(">", "") :
-                                args[1].replace("<@", "").replace(">", "");
-                        Member member = event.getGuild().getMemberById(id);
-                        if (member == null) {
-                            noMemberExceptionEmbed(event);
-                        } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
-                            sendImageEmbed(event, imageUrl);
-                        } else {
-                            memberHasNoAvatarExceptionEmbed(event);
-                        }
-                    } else {
-                        noMemberMentionEmbed(event);
-                    }
+                    showUserAvatar(event, args[1]);
                 }
             }
         }
     }
 
-    private void memberHasNoAvatarExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder noAvatar = new EmbedBuilder();
-        noAvatar.setColor(0xf2480a);
-        noAvatar.setDescription("У пользователя отсутствует картинка на аватаре.");
-        event.getChannel().sendMessage(noAvatar.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        noAvatar.clear();
+    private void showUserAvatar(GuildMessageReceivedEvent event, String user) {
+        String imageUrl;
+        if (user.startsWith("<@")) {
+            Member member = findMember(event, user);
+            if (member == null) {
+                errorEmbed(event, CANT_FIND_MEMBER, null);
+            } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
+                sendImageEmbed(event, imageUrl);
+            } else {
+                errorEmbed(event, NO_AVATAR, null);
+            }
+        } else {
+            errorEmbed(event, NEED_TO_MENTION, USAGE);
+        }
     }
 
-    private void noMemberExceptionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder noAvatar = new EmbedBuilder();
-        noAvatar.setColor(0xf2480a);
-        noAvatar.setDescription("Не могу найти этого пользователя на сервере :(");
-        event.getChannel().sendMessage(noAvatar.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        noAvatar.clear();
+    private void showSelfAvatar(GuildMessageReceivedEvent event) {
+        String imageUrl;
+        if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
+            sendImageEmbed(event, imageUrl);
+        } else {
+            errorEmbed(event, NO_SELF_AVATAR, null);
+        }
     }
 
-    private void noAvatarExceptionEmbed(GuildMessageReceivedEvent event) {
+    private Member findMember(GuildMessageReceivedEvent event, String user) {
+        String id = user.startsWith("<@!") ?
+                user.replace("<@!", "").replace(">", "") :
+                user.replace("<@", "").replace(">", "");
+        return event.getGuild().getMemberById(id);
+    }
+
+    private void errorEmbed(GuildMessageReceivedEvent event, String title, String description) {
         event.getMessage().delete().queue();
-        EmbedBuilder noAvatar = new EmbedBuilder();
-        noAvatar.setColor(0xf2480a);
-        noAvatar.setDescription("У тебя нет картинки на аватаре, что я тебе показать должен?");
-        event.getChannel().sendMessage(noAvatar.build())
+        EmbedBuilder error = new EmbedBuilder();
+        error.setColor(0xf2480a);
+        error.setDescription(title);
+        if (description != null) error.setDescription(description);
+        event.getChannel().sendMessage(error.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
-        noAvatar.clear();
+        error.clear();
     }
 
     private void sendImageEmbed(GuildMessageReceivedEvent event, String imageUrL) {
         event.getMessage().delete().queue();
+        EmbedBuilder image = new EmbedBuilder();
         image.setImage(imageUrL);
         image.setColor(0x14f51b);
         event.getChannel().sendMessage(image.build()).queue();
         image.clear();
-    }
-
-    private void noMemberMentionEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder needMention = new EmbedBuilder();
-        needMention.setColor(0xf2480a);
-        needMention.setTitle("Нужно упомянуть пользователя");
-        needMention.setDescription("Используй: " + App.prefix + "avatar @User");
-        event.getChannel().sendMessage(needMention.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        needMention.clear();
     }
 }

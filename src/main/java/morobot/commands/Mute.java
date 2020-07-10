@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -22,27 +22,33 @@ public class Mute extends ListenerAdapter {
     private static String id;
     private String errorDescription;
     private static final String MUTE_ROLE = "730486590870126623";
+    private static final String WRONG_COMMAND = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
+    private static final String NO_PERMISSIONS = "У тебя нет прав на добавление ролей.";
+    private static final String CANT_FIND_USER = "Не могу найти этого пользователя на сервере :(";
+    private static final String TOO_BIG_MUTE_TIME = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 34560] минут.";
+    private static final String WRONG_MUTE_TIME = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        if (!event.getAuthor().isBot()) {
+
+        User author = event.getAuthor();
+        Member member = event.getMember();
+
+        if (!author.isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
-            if (!event.getAuthor().isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
-                if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-                    errorDescription = "У тебя нет прав на добавление ролей.";
-                    errorExceptionEmbed(event, errorDescription);
+            if (!author.isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
+                if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+                    errorEmbed(event, NO_PERMISSIONS);
                 } else if (args.length > 1 && args.length < 4) {
                     if (!args[1].startsWith("<@")) {
-                        errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
-                        errorExceptionEmbed(event, errorDescription);
+                        errorEmbed(event, WRONG_COMMAND);
                     }
                     //Команда без счетчика времени.
                     if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
                     //Команда со счетчиком времени.
                     if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
                 } else {
-                    errorDescription = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
-                    errorExceptionEmbed(event, errorDescription);
+                    errorEmbed(event, WRONG_COMMAND);
                 }
             }
         }
@@ -63,16 +69,14 @@ public class Mute extends ListenerAdapter {
                 try {
                     muteWithTimeScheduleDependOnPermissions(event, member, role, args[2], id);
                 } catch (NumberFormatException e) {
-                    errorDescription = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
-                    errorExceptionEmbed(event, errorDescription);
+                    errorEmbed(event, WRONG_MUTE_TIME);
                 }
             } else {
                 errorDescription = member.getUser().getName() + " уже отстранен.";
-                errorExceptionEmbed(event, errorDescription);
+                errorEmbed(event, errorDescription);
             }
         } else {
-            errorDescription = "Не могу найти этого пользователя на сервере :(";
-            errorExceptionEmbed(event, errorDescription);
+            errorEmbed(event, CANT_FIND_USER);
         }
     }
 
@@ -82,16 +86,14 @@ public class Mute extends ListenerAdapter {
         if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
                 member.hasPermission(Permission.ADMINISTRATOR)) {
             errorDescription = "Невозможно отстранить " + member.getUser().getName();
-            errorExceptionEmbed(event , errorDescription);
+            errorEmbed(event , errorDescription);
         } else {
             int time = Integer.parseInt(muteTime);
             if (time <= 0) {
-                errorDescription = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
-                errorExceptionEmbed(event, errorDescription);
+                errorEmbed(event, WRONG_MUTE_TIME);
             } else {
                 if (time > 34560) {
-                    errorDescription = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 34560] минут.";
-                    errorExceptionEmbed(event, errorDescription);
+                    errorEmbed(event, TOO_BIG_MUTE_TIME);
                 } else {
                     startTimer(event, time, role); //Таймер
                     event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
@@ -124,11 +126,10 @@ public class Mute extends ListenerAdapter {
                 muteDependOnPermissions(event, member, role, id);
             } else {
                 errorDescription = member.getUser().getName() + " уже отстранен.";
-                errorExceptionEmbed(event, errorDescription);
+                errorEmbed(event, errorDescription);
             }
         } else {
-            errorDescription = "Не могу найти этого пользователя на сервере :(";
-            errorExceptionEmbed(event, errorDescription);
+            errorEmbed(event, CANT_FIND_USER);
         }
     }
 
@@ -138,7 +139,7 @@ public class Mute extends ListenerAdapter {
         if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
                 member.hasPermission(Permission.ADMINISTRATOR)) {
             errorDescription = "Невозможно отстранить " + member.getUser().getName();
-            errorExceptionEmbed(event, errorDescription);
+            errorEmbed(event, errorDescription);
         } else {
             event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
             roleAddEmbed(event); //Сообщение об отстранении пользователя
@@ -194,7 +195,7 @@ public class Mute extends ListenerAdapter {
         removeRole.clear();
     }
 
-    private void errorExceptionEmbed(GuildMessageReceivedEvent event, String description) {
+    private void errorEmbed(GuildMessageReceivedEvent event, String description) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
