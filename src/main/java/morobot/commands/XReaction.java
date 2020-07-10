@@ -13,9 +13,11 @@ import java.util.Map;
 public class XReaction extends ListenerAdapter {
 
     public static Map<String, String> usersUsedCommand = new HashMap<>();
+
     static {
         load();
     }
+
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
@@ -41,6 +43,7 @@ public class XReaction extends ListenerAdapter {
         usersUsedCommand.remove(event.getMessageId());
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
             oos.writeObject(usersUsedCommand);
+            System.out.println(XReaction.usersUsedCommand);
         }
         catch(Exception ex) {
             System.out.println(ex.getMessage());
@@ -51,6 +54,7 @@ public class XReaction extends ListenerAdapter {
         usersUsedCommand.put(id, author);
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
             oos.writeObject(usersUsedCommand);
+            System.out.println(XReaction.usersUsedCommand);
         }
         catch(Exception ex) {
             System.out.println(ex.getMessage());
@@ -59,7 +63,11 @@ public class XReaction extends ListenerAdapter {
 
     private static void load () {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream("logs.dat"))) {
-            usersUsedCommand = (Map<String, String>) ois.readObject();
+            Map<String, String> checkMap;
+            if ((checkMap = (Map<String, String>) ois.readObject()) != null) {
+                usersUsedCommand = checkMap;
+            }
+            System.out.println(XReaction.usersUsedCommand);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

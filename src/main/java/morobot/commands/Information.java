@@ -41,7 +41,6 @@ public class Information extends ListenerAdapter {
                 action.queue(message -> {
                     message.addReaction("❌").queue();
                     XReaction.putAndSave(message.getId(), event.getMember().getId());
-                    System.out.println(XReaction.usersUsedCommand);
                 });
                 info.clear();
             }
