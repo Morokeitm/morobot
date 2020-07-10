@@ -40,7 +40,7 @@ public class Information extends ListenerAdapter {
                 RestAction<Message> action = event.getChannel().sendMessage(info.build());
                 action.queue(message -> {
                     message.addReaction("❌").queue();
-                    XReaction.putAndSave(message.getId(), event.getAuthor());
+                    XReaction.putAndSave(message.getId(), event.getMember().getId());
                     System.out.println(XReaction.usersUsedCommand);
                 });
                 info.clear();

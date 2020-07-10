@@ -202,7 +202,7 @@ public class Mute extends ListenerAdapter {
         action.queue((message) -> {
             //Добавляем реакцию ❌ к сообщению об ошибке
             message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getAuthor());
+            XReaction.putAndSave(message.getId(), event.getMember().getId());
             message.delete().queueAfter(15, TimeUnit.SECONDS);
         });
         error.clear();

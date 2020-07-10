@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class XReaction extends ListenerAdapter {
 
-    public static Map<String, User> usersUsedCommand = new HashMap<>();
+    public static Map<String, String> usersUsedCommand = new HashMap<>();
     static {
         load();
     }
@@ -28,7 +28,7 @@ public class XReaction extends ListenerAdapter {
         }
         if(event.getReactionEmote().getName().equals("❌") &&
                 usersUsedCommand.containsKey(event.getMessageId())) {
-            if (event.getUser().equals(usersUsedCommand.get(event.getMessageId()))) {
+            if (event.getMember().getId().equals(usersUsedCommand.get(event.getMessageId()))) {
                 deleteAndSave(event);
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             } else {
@@ -36,7 +36,7 @@ public class XReaction extends ListenerAdapter {
             }
         }
     }
-    //Сериализация пока не работает.
+    //Сохранение и запись событий, чтобы перезагрузка программы не нарушала логику работы с предыдущими сообщениями.
     private static void deleteAndSave(GuildMessageReactionAddEvent event) {
         usersUsedCommand.remove(event.getMessageId());
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
@@ -47,7 +47,7 @@ public class XReaction extends ListenerAdapter {
         }
     }
 
-    public static void putAndSave (String id, User author) {
+    public static void putAndSave (String id, String author) {
         usersUsedCommand.put(id, author);
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("logs.dat"))) {
             oos.writeObject(usersUsedCommand);
@@ -59,7 +59,7 @@ public class XReaction extends ListenerAdapter {
 
     private static void load () {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream("logs.dat"))) {
-            usersUsedCommand = (Map<String, User>) ois.readObject();
+            usersUsedCommand = (Map<String, String>) ois.readObject();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
