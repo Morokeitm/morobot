@@ -9,6 +9,7 @@
 /.groovy/*
 *.orig
 test-output/
+target
 
 # https://github.com/github/gitignore/blob/master/Global/MicrosoftOffice.gitignore
 *.tmp
