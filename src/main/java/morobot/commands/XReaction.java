@@ -16,9 +16,11 @@ public class XReaction extends ListenerAdapter {
 
     private static final String FILE_NAME = "logs.dat";
     public static Map<String, String> usersUsedCommand = new HashMap<>();
+
     static {
         load();
     }
+
     //Если пользователь, который ввел команду, или пользователь с правами удаления сообщений нажимает на реакцию, то сообщение бота удаляется.
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
@@ -28,14 +30,14 @@ public class XReaction extends ListenerAdapter {
         User user = event.getUser();
         Member member = event.getMember();
 
-        if(reaction.equals("❌") &&
+        if (reaction.equals("❌") &&
                 !user.isBot() &&
                 usersUsedCommand.containsKey(messageId)) {
             if (member.getPermissions().contains(Permission.MESSAGE_MANAGE)) {
                 event.getChannel().deleteMessageById(messageId).queue();
             } else if (member.getId().equals(usersUsedCommand.get(messageId))) {
                 event.getChannel().deleteMessageById(messageId).queue();
-            } else if(!user.isBot()) {
+            } else if (!user.isBot()) {
                 event.getReaction().removeReaction(user).queue();
             }
         }
@@ -52,28 +54,26 @@ public class XReaction extends ListenerAdapter {
     //Сохранение и запись событий, чтобы перезагрузка программы не нарушала логику работы с предыдущими сообщениями.
     private static void deleteAndSave(String message) {
         usersUsedCommand.remove(message);
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(usersUsedCommand);
             System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    public static void putAndSave (String id, String author) {
+    public static void putAndSave(String id, String author) {
         usersUsedCommand.put(id, author);
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(usersUsedCommand);
             System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    private static void load () {
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+    private static void load() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             Map<String, String> checkMap;
             if ((checkMap = (Map<String, String>) ois.readObject()) != null) usersUsedCommand = checkMap;
             System.out.println("Лог сохраняемых id:" + XReaction.usersUsedCommand);

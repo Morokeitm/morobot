@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ShowAvatar extends ListenerAdapter {
@@ -17,7 +18,7 @@ public class ShowAvatar extends ListenerAdapter {
         if (!event.getAuthor().isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
             // проверяем, является ли сообщение командой .avatar.
-            if (args[0].equalsIgnoreCase(App.prefix + "avatar")) {
+            if (args[0].equalsIgnoreCase(App.PREFIX + "avatar")) {
                 if (args.length == 1) {
                     /*если хочет посмотреть свой аватар.
                      проверяем есть ли аватар у пользователя*/
@@ -33,17 +34,17 @@ public class ShowAvatar extends ListenerAdapter {
 
     private void showUserAvatar(GuildMessageReceivedEvent event, String user) {
         String imageUrl;
-        if (user.startsWith("<@")) {
-            Member member = findMember(event, user);
-            if (member == null) {
-                errorEmbed(event, Constants.CANT_FIND_MEMBER, null);
-            } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
-                sendImageEmbed(event, imageUrl);
-            } else {
-                errorEmbed(event, Constants.NO_AVATAR, null);
-            }
+        String memberId = findMemberId(event, user);
+        Member member = null;
+        if (memberId != null) {
+            member = event.getGuild().getMemberById(memberId);
+        }
+        if (member == null) {
+            errorEmbed(event, Constants.CANT_FIND_MEMBER, null);
+        } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
+            sendImageEmbed(event, imageUrl);
         } else {
-            errorEmbed(event, Constants.NEED_TO_MENTION, Constants.COMMAND_USAGE);
+            errorEmbed(event, Constants.NO_AVATAR, null);
         }
     }
 
@@ -56,11 +57,28 @@ public class ShowAvatar extends ListenerAdapter {
         }
     }
 
-    private Member findMember(GuildMessageReceivedEvent event, String user) {
-        String id = user.startsWith("<@!") ?
-                user.replace("<@!", "").replace(">", "") :
-                user.replace("<@", "").replace(">", "");
-        return event.getGuild().getMemberById(id);
+    private String findMemberId(GuildMessageReceivedEvent event, String user) {
+        String id = null;
+        if (user.startsWith("<@")) {
+            id = user.startsWith("<@!") ?
+                    user.replace("<@!", "").replace(">", "") :
+                    user.replace("<@", "").replace(">", "");
+        } else if (!user.startsWith("<@")) {
+            List<Member> members = event.getGuild().getMembersByName(user, true);
+            if (members.size() > 1) {
+                errorEmbed(event, Constants.TOO_MANY_MEMBERS, null);
+            } else if (members.size() != 0) {
+                id = members.get(0).getId();
+            } else {
+                List<Member> users = event.getGuild().getMembersByEffectiveName(user, true);
+                if (users.size() > 1) {
+                    errorEmbed(event, Constants.TOO_MANY_USERS, null);
+                } else if (users.size() != 0) {
+                    id = users.get(0).getId();
+                }
+            }
+        }
+        return id;
     }
 
     private void errorEmbed(GuildMessageReceivedEvent event, String title, String description) {

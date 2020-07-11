@@ -5,21 +5,21 @@ import morobot.App;
 public class Constants {
     //Константы класса "TextMute"
     static final String MUTE_ROLE = "730486590870126623";
-    static final String WRONG_COMMAND = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]";
+    static final String WRONG_COMMAND = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.PREFIX + "mute [user] [time (optional, min)]";
     static final String NO_PERMISSIONS = "У тебя нет прав на добавление ролей.";
     static final String CANT_FIND_USER = "Не могу найти этого пользователя на сервере :(";
     static final String TOO_BIG_MUTE_TIME = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 34560] минут.";
-    static final String WRONG_MUTE_TIME = "Указано некорректное время отстранения\nИспользуй: " + App.prefix + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
+    static final String WRONG_MUTE_TIME = "Указано некорректное время отстранения\nИспользуй: " + App.PREFIX + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
 
     //Константы класса "ShowAvatar"
     static final String NO_AVATAR = "У пользователя отсутствует картинка на аватаре.";
     static final String CANT_FIND_MEMBER = "Не могу найти этого пользователя на сервере :(";
+    static final String TOO_MANY_MEMBERS = "Такое имя у нескольких человек в дискорде.\nПопробуй указать имя пользователя на сервере, или упомянуть его через @User."; // + "TextMute"
+    static final String TOO_MANY_USERS = "Такое имя у нескольких человек на сервере.\nПопробуй указать имя пользователя в дискорде, или упомянуть его через @User."; // + "TextMute"
     static final String NO_SELF_AVATAR = "У тебя нет картинки на аватаре, что я тебе показать должен?";
-    static final String COMMAND_USAGE = "Используй: " + App.prefix + "avatar @User";
-    static final String NEED_TO_MENTION= "Нужно упомянуть пользователя";
 
     //Константы класса "ClearMessages"
-    static final String USAGE = "Используй: " + App.prefix + "clear [1-99]";
+    static final String USAGE = "Используй: " + App.PREFIX + "clear [1-99]";
     static final String NOT_A_DIGIT = "Указанное значение не является числом.";
     static final String NO_COUNT_OF_MESSAGES = "Не указано количество удаляемых сообщений.";
     static final String WRONG_COUNT_OF_MESSAGES = "Указано недопустимое количество сообщений.";

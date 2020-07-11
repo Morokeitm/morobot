@@ -16,7 +16,7 @@ public class ClearMessages extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         String[] args = event.getMessage().getContentRaw().split("\\s+");
-        if(args[0].equalsIgnoreCase(App.prefix + "clear")) {
+        if (args[0].equalsIgnoreCase(App.PREFIX + "clear")) {
             if (event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE)) {
                 if (args.length < 2) {
                     errorEmbed(event, Constants.NO_COUNT_OF_MESSAGES, Constants.USAGE);

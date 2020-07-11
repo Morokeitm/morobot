@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.Activity;
 
 public class App {
     static JDA builder;
-    public static String prefix = "!";
+    public static final String PREFIX = "!";
 
     public static void main(String[] args) throws Exception {
 //        final String token = args[0]; Временно не используется
@@ -28,6 +28,6 @@ public class App {
         builder.addEventListener(new MentionHandler()); //Поверка упоминания отдельных пользователей.
         builder.addEventListener(new ShowAvatar()); //Команда отображения аватара.
         builder.addEventListener(new TextMute()); //Команда выдачи роли мута (Код роли у каждого сервера разный).
-        builder.addEventListener(new  XReaction());
+        builder.addEventListener(new XReaction());
     }
 }

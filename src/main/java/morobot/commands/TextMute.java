@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -30,17 +31,14 @@ public class TextMute extends ListenerAdapter {
 
         if (!author.isBot()) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
-            if (!author.isBot() && args[0].equalsIgnoreCase(App.prefix + "mute")) {
+            if (!author.isBot() && args[0].equalsIgnoreCase(App.PREFIX + "mute")) {
                 if (!member.hasPermission(Permission.MANAGE_ROLES)) {
                     errorEmbed(event, Constants.NO_PERMISSIONS);
                 } else if (args.length > 1 && args.length < 4) {
-                    if (!args[1].startsWith("<@")) {
-                        errorEmbed(event, Constants.WRONG_COMMAND);
-                    }
                     //Команда без счетчика времени.
-                    if (args.length == 2 && args[1].startsWith("<@")) muteWithoutTimeSchedule(event, args);
+                    if (args.length == 2) muteWithoutTimeSchedule(event, args);
                     //Команда со счетчиком времени.
-                    if (args.length == 3 && args[1].startsWith("<@")) muteWithTimeSchedule(event, args);
+                    if (args.length == 3) muteWithTimeSchedule(event, args);
                 } else {
                     errorEmbed(event, Constants.WRONG_COMMAND);
                 }
@@ -48,11 +46,30 @@ public class TextMute extends ListenerAdapter {
         }
     }
 
-    private void findMemberById(GuildMessageReceivedEvent event, String arg) {
-        id = arg.startsWith("<@!") ?
-                arg.replace("<@!", "").replace(">", "") :
-                arg.replace("<@", "").replace(">", "");
-        member = event.getGuild().getMemberById(id);
+    private void findMemberById(GuildMessageReceivedEvent event, String user) {
+        id = null;
+        if (user.startsWith("<@")) {
+            id = user.startsWith("<@!") ?
+                    user.replace("<@!", "").replace(">", "") :
+                    user.replace("<@", "").replace(">", "");
+        } else if (!user.startsWith("<@")) {
+            List<Member> members = event.getGuild().getMembersByName(user, true);
+            if (members.size() > 1) {
+                errorEmbed(event, Constants.TOO_MANY_MEMBERS);
+            } else if (members.size() != 0) {
+                id = members.get(0).getId();
+            } else {
+                List<Member> users = event.getGuild().getMembersByEffectiveName(user, true);
+                if (users.size() > 1) {
+                    errorEmbed(event, Constants.TOO_MANY_USERS);
+                } else if (users.size() != 0) {
+                    id = users.get(0).getId();
+                }
+            }
+        }
+        if (id != null) {
+            member = event.getGuild().getMemberById(id);
+        }
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -79,8 +96,10 @@ public class TextMute extends ListenerAdapter {
         Пользователь с правами ролей не сможет отстранить никого старше себя.*/
         if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
                 member.hasPermission(Permission.ADMINISTRATOR)) {
-            errorDescription = "Невозможно отстранить " + member.getUser().getName();
-            errorEmbed(event , errorDescription);
+            errorDescription = "Невозможно отстранить " + (member.getNickname() == null ?
+                    member.getUser().getName() :
+                    member.getUser().getName() + " (" + member.getNickname() + ")");
+            errorEmbed(event, errorDescription);
         } else {
             int time = Integer.parseInt(muteTime);
             if (time <= 0) {
@@ -100,6 +119,7 @@ public class TextMute extends ListenerAdapter {
     private void startTimer(GuildMessageReceivedEvent event, int time, Role role) {
         new Timer().schedule(new TimerTask() {
             Member member = TextMute.member;
+
             @Override
             public void run() {
                 if (member.getRoles().contains(role)) {
@@ -119,7 +139,9 @@ public class TextMute extends ListenerAdapter {
             if (!member.getRoles().contains(role)) {
                 muteDependOnPermissions(event, member, role, id);
             } else {
-                errorDescription = member.getUser().getName() + " уже отстранен.";
+                errorDescription = member.getNickname() == null ?
+                        member.getUser().getName() + " уже отстранен." :
+                        member.getUser().getName() + " (" + member.getNickname() + ")" + " уже отстранен.";
                 errorEmbed(event, errorDescription);
             }
         } else {
@@ -132,7 +154,9 @@ public class TextMute extends ListenerAdapter {
         Пользователь с правами ролей не сможет отстранить никого старше себя.*/
         if ((member.hasPermission(Permission.MANAGE_ROLES) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
                 member.hasPermission(Permission.ADMINISTRATOR)) {
-            errorDescription = "Невозможно отстранить " + member.getUser().getName();
+            errorDescription = "Невозможно отстранить " + (member.getNickname() == null ?
+                    member.getUser().getName() :
+                    member.getUser().getName() + " (" + member.getNickname() + ")");
             errorEmbed(event, errorDescription);
         } else {
             event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
@@ -145,7 +169,9 @@ public class TextMute extends ListenerAdapter {
         EmbedBuilder succeed = new EmbedBuilder();
         succeed.setColor(0xfcba03);
         succeed.setTitle("Отстранение:");
-        succeed.setDescription(member.getUser().getName());
+        succeed.setDescription(member.getNickname() == null ?
+                member.getUser().getName() :
+                member.getUser().getName() + " (" + member.getNickname() + ")");
         event.getChannel().sendMessage(succeed.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
@@ -158,16 +184,18 @@ public class TextMute extends ListenerAdapter {
         event.getMessage().delete().queue();
         String timeText = "";
         if (time < 60) timeText = "Минут: " + time;
-        if (time >= 60 && time <1440) {
-            timeText = "Часов: " + time/60 + ", Минут: " + time%60;
+        if (time >= 60 && time < 1440) {
+            timeText = "Часов: " + time / 60 + ", Минут: " + time % 60;
         }
         if (time >= 1440) {
-            timeText = "Дней: " + time/1440 + ", Часов: " + (time%1440)/60 + ", Минут: " + (time%1440)%60;
+            timeText = "Дней: " + time / 1440 + ", Часов: " + (time % 1440) / 60 + ", Минут: " + (time % 1440) % 60;
         }
         EmbedBuilder succeed = new EmbedBuilder();
         succeed.setColor(0xfcba03);
         succeed.setTitle("Отстранение:");
-        succeed.setDescription(member.getUser().getName());
+        succeed.setDescription(member.getNickname() == null ?
+                member.getUser().getName() :
+                member.getUser().getName() + " (" + member.getNickname() + ")");
         succeed.addField("Время:", timeText, true);
         event.getChannel().sendMessage(succeed.build())
                 .delay(5, TimeUnit.SECONDS)
@@ -181,7 +209,9 @@ public class TextMute extends ListenerAdapter {
         EmbedBuilder removeRole = new EmbedBuilder();
         removeRole.setColor(0x14f51b);
         removeRole.setTitle("Отстранение снято:");
-        removeRole.setDescription(member.getUser().getName());
+        removeRole.setDescription(member.getNickname() == null ?
+                member.getUser().getName() :
+                member.getUser().getName() + " (" + member.getNickname() + ")");
         event.getChannel().sendMessage(removeRole.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
