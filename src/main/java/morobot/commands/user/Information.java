@@ -1,21 +1,18 @@
-package morobot.commands;
+package morobot.commands.user;
 
 import morobot.App;
+import morobot.commands.XReaction;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 
-import javax.annotation.Nonnull;
+public class Information{
 
-public class Information extends ListenerAdapter {
+    public void onInfoCommand(GuildMessageReceivedEvent event, String[] args) {
 
-    @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        String[] args = event.getMessage().getContentRaw().split("\\s+");
-        if (!event.getAuthor().isBot() && event.getMember() != null) {
+        if (event.getMember() != null) {
             if (args[0].equalsIgnoreCase(App.PREFIX + "info")) {
                 event.getMessage().delete().queue();
                 EmbedBuilder info = new EmbedBuilder();

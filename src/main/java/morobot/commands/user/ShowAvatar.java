@@ -1,35 +1,32 @@
-package morobot.commands;
+package morobot.commands.user;
 
 import morobot.App;
+import morobot.commands.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ShowAvatar extends ListenerAdapter {
+public class ShowAvatar{
 
-    @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        if (!event.getAuthor().isBot()) {
-            String[] args = event.getMessage().getContentRaw().split("\\s+");
-            // проверяем, является ли сообщение командой .avatar.
-            if (args[0].equalsIgnoreCase(App.PREFIX + "avatar")) {
-                if (args.length == 1) {
+    public void onAvatarCommand(GuildMessageReceivedEvent event, String[] args) {
+
+        // проверяем, является ли сообщение командой .avatar.
+        if (args[0].equalsIgnoreCase(App.PREFIX + "avatar")) {
+            if (args.length == 1) {
                     /*если хочет посмотреть свой аватар.
                      проверяем есть ли аватар у пользователя*/
-                    showSelfAvatar(event);
-                } else if (args.length == 2) {
+                showSelfAvatar(event);
+            } else if (args.length == 2) {
                     /* если хочет посмотреть чей-то аватар.
                      проверяем, упомянут ли пользователь через @User.*/
-                    showUserAvatar(event, args[1]);
-                }
+                showUserAvatar(event, args[1]);
             }
         }
+
     }
 
     private void showUserAvatar(GuildMessageReceivedEvent event, String user) {
@@ -40,11 +37,11 @@ public class ShowAvatar extends ListenerAdapter {
             member = event.getGuild().getMemberById(memberId);
         }
         if (member == null) {
-            errorEmbed(event, Constants.CANT_FIND_MEMBER, null);
+            errorEmbed(event, Constants.CANT_FIND_MEMBER);
         } else if ((imageUrl = member.getUser().getAvatarUrl()) != null) {
             sendImageEmbed(event, imageUrl);
         } else {
-            errorEmbed(event, Constants.NO_AVATAR, null);
+            errorEmbed(event, Constants.NO_AVATAR);
         }
     }
 
@@ -53,7 +50,7 @@ public class ShowAvatar extends ListenerAdapter {
         if ((imageUrl = event.getAuthor().getAvatarUrl()) != null) {
             sendImageEmbed(event, imageUrl);
         } else {
-            errorEmbed(event, Constants.NO_SELF_AVATAR, null);
+            errorEmbed(event, Constants.NO_SELF_AVATAR);
         }
     }
 
@@ -66,13 +63,13 @@ public class ShowAvatar extends ListenerAdapter {
         } else if (!user.startsWith("<@")) {
             List<Member> members = event.getGuild().getMembersByName(user, true);
             if (members.size() > 1) {
-                errorEmbed(event, Constants.TOO_MANY_MEMBERS, null);
+                errorEmbed(event, Constants.TOO_MANY_MEMBERS);
             } else if (members.size() != 0) {
                 id = members.get(0).getId();
             } else {
                 List<Member> users = event.getGuild().getMembersByEffectiveName(user, true);
                 if (users.size() > 1) {
-                    errorEmbed(event, Constants.TOO_MANY_USERS, null);
+                    errorEmbed(event, Constants.TOO_MANY_USERS);
                 } else if (users.size() != 0) {
                     id = users.get(0).getId();
                 }
@@ -81,11 +78,11 @@ public class ShowAvatar extends ListenerAdapter {
         return id;
     }
 
-    private void errorEmbed(GuildMessageReceivedEvent event, String title, String description) {
+    private void errorEmbed(GuildMessageReceivedEvent event, String description) {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
-        error.setDescription(title);
+        error.setDescription(description);
         if (description != null) error.setDescription(description);
         event.getChannel().sendMessage(error.build())
                 .delay(5, TimeUnit.SECONDS)

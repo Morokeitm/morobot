@@ -1,10 +1,6 @@
 package morobot;
 
-import morobot.commands.ClearMessages;
-import morobot.commands.Information;
-import morobot.commands.MentionHandler;
-import morobot.commands.ShowAvatar;
-import morobot.commands.TextMute;
+import morobot.commands.Commands;
 import morobot.commands.XReaction;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -23,11 +19,7 @@ public class App {
                 .build();
 
         builder.getPresence().setStatus(OnlineStatus.ONLINE);
-        builder.addEventListener(new ClearMessages()); //Команда удаления сообщений.
-        builder.addEventListener(new Information()); //Команда показа информации о боте.
-        builder.addEventListener(new MentionHandler()); //Поверка упоминания отдельных пользователей.
-        builder.addEventListener(new ShowAvatar()); //Команда отображения аватара.
-        builder.addEventListener(new TextMute()); //Команда выдачи роли мута (Код роли у каждого сервера разный).
+        builder.addEventListener(new Commands());
         builder.addEventListener(new XReaction());
     }
 }

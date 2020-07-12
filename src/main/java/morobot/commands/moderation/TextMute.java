@@ -1,48 +1,39 @@
-package morobot.commands;
+package morobot.commands.moderation;
 
-import morobot.App;
+import morobot.commands.Constants;
+import morobot.commands.XReaction;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class TextMute extends ListenerAdapter {
+public class TextMute {
 
     private static Member member;
     private static String id;
     private String errorDescription;
 
-    @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
+    public void onMuteCommand(GuildMessageReceivedEvent event, String[] args) {
 
-        User author = event.getAuthor();
         Member member = event.getMember();
 
-        if (!author.isBot()) {
-            String[] args = event.getMessage().getContentRaw().split("\\s+");
-            if (!author.isBot() && args[0].equalsIgnoreCase(App.PREFIX + "mute")) {
-                if (!member.hasPermission(Permission.MANAGE_ROLES)) {
-                    errorEmbed(event, Constants.NO_PERMISSIONS);
-                } else if (args.length > 1 && args.length < 4) {
-                    //Команда без счетчика времени.
-                    if (args.length == 2) muteWithoutTimeSchedule(event, args);
-                    //Команда со счетчиком времени.
-                    if (args.length == 3) muteWithTimeSchedule(event, args);
-                } else {
-                    errorEmbed(event, Constants.WRONG_COMMAND);
-                }
-            }
+        if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+            errorEmbed(event, Constants.NO_PERMISSIONS_TO_ADDING_ROLES);
+        } else if (args.length > 1 && args.length < 4) {
+            //Команда без счетчика времени.
+            if (args.length == 2) muteWithoutTimeSchedule(event, args);
+            //Команда со счетчиком времени.
+            if (args.length == 3) muteWithTimeSchedule(event, args);
+        } else {
+            errorEmbed(event, Constants.WRONG_COMMAND);
         }
     }
 
