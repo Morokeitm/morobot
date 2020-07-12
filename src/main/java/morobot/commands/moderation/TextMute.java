@@ -1,21 +1,20 @@
 package morobot.commands.moderation;
 
 import morobot.commands.Constants;
-import morobot.commands.XReaction;
+import morobot.commands.ErrorEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class TextMute {
+public class TextMute extends ErrorEmbed {
 
     private static Member member;
     private static String id;
@@ -60,7 +59,7 @@ public class TextMute {
         }
         if (id != null) {
             member = event.getGuild().getMemberById(id);
-        }
+        } else member = null;
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -123,8 +122,6 @@ public class TextMute {
 
     private void muteWithoutTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
         findMemberById(event, args[1]);
-//        XReaction.user = event.getAuthor();
-//        XReaction.reaction = true;
         if (member != null) {
             Role role = event.getGuild().getRoleById(Constants.MUTE_ROLE);
             if (!member.getRoles().contains(role)) {
@@ -208,21 +205,5 @@ public class TextMute {
                 .flatMap(Message::delete)
                 .queue();
         removeRole.clear();
-    }
-
-    private void errorEmbed(GuildMessageReceivedEvent event, String description) {
-        event.getMessage().delete().queue();
-        EmbedBuilder error = new EmbedBuilder();
-        error.setColor(0xf2480a);
-        error.setDescription(description);
-        RestAction<Message> action = event.getChannel().sendMessage(error.build());
-        action.queue((message) -> {
-            //Добавляем реакцию ❌ к сообщению об ошибке
-            message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getMember().getId());
-            message.delete().queueAfter(15, TimeUnit.SECONDS);
-        });
-        error.clear();
-        member = null;
     }
 }

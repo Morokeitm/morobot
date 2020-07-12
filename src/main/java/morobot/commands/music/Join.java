@@ -1,15 +1,14 @@
 package morobot.commands.music;
 
 import morobot.commands.Constants;
-import morobot.commands.XReaction;
+import morobot.commands.ErrorEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.util.concurrent.TimeUnit;
 
-public class Join {
+public class Join extends ErrorEmbed {
 
     public void onJoinCommand(GuildMessageReceivedEvent event, String[] args) {
 
@@ -20,7 +19,7 @@ public class Join {
                 isConnected(event);
             }
         } else {
-            errorEmbed(event);
+            errorEmbed(event, Constants.WRONG_CHANNEL);
         }
     }
 
@@ -56,20 +55,5 @@ public class Join {
                 .flatMap(Message::delete)
                 .queue();
         succeed.clear();
-    }
-
-    private static void errorEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder error = new EmbedBuilder();
-        error.setColor(0xf2480a);
-        error.setDescription(Constants.WRONG_CHANNEL);
-        RestAction<Message> action = event.getChannel().sendMessage(error.build());
-        action.queue((message) -> {
-            //Добавляем реакцию ❌ к сообщению об ошибке
-            message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getMember().getId());
-            message.delete().queueAfter(15, TimeUnit.SECONDS);
-        });
-        error.clear();
     }
 }

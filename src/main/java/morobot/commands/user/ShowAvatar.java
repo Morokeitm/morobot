@@ -2,15 +2,14 @@ package morobot.commands.user;
 
 import morobot.App;
 import morobot.commands.Constants;
+import morobot.commands.ErrorEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-public class ShowAvatar{
+public class ShowAvatar extends ErrorEmbed {
 
     public void onAvatarCommand(GuildMessageReceivedEvent event, String[] args) {
 
@@ -76,19 +75,6 @@ public class ShowAvatar{
             }
         }
         return id;
-    }
-
-    private void errorEmbed(GuildMessageReceivedEvent event, String description) {
-        event.getMessage().delete().queue();
-        EmbedBuilder error = new EmbedBuilder();
-        error.setColor(0xf2480a);
-        error.setDescription(description);
-        if (description != null) error.setDescription(description);
-        event.getChannel().sendMessage(error.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        error.clear();
     }
 
     private void sendImageEmbed(GuildMessageReceivedEvent event, String imageUrL) {

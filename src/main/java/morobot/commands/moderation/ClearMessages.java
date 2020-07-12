@@ -1,6 +1,7 @@
 package morobot.commands.moderation;
 
 import morobot.commands.Constants;
+import morobot.commands.ErrorEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,7 +10,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ClearMessages{
+public class ClearMessages extends ErrorEmbed {
 
     public void onClearCommand(GuildMessageReceivedEvent event, String[] args) {
 
@@ -36,19 +37,6 @@ public class ClearMessages{
             //Нет прав для удаления сообщений
             errorEmbed(event, Constants.NO_PERMISSION_TO_DELETE_MESSAGES, Constants.WHO_ABLE_TO_USE_COMMAND);
         }
-    }
-
-    private void errorEmbed(GuildMessageReceivedEvent event, String title, String description) {
-        event.getMessage().delete().queue();
-        EmbedBuilder error = new EmbedBuilder();
-        error.setColor(0xf2480a);
-        error.setTitle(title);
-        error.setDescription(description);
-        event.getChannel().sendMessage(error.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        error.clear();
     }
 
     private void deletedMessagesEmbed(GuildMessageReceivedEvent event, String count) {

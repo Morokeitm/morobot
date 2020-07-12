@@ -1,18 +1,15 @@
 package morobot.commands.music;
 
 import morobot.commands.Constants;
-import morobot.commands.XReaction;
+import morobot.commands.ErrorEmbed;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
-public class Play {
+public class Play extends ErrorEmbed {
 
     private static GuildMessageReceivedEvent currentEvent;
 
@@ -55,21 +52,6 @@ public class Play {
         } catch (MalformedURLException e) {
             return false;
         }
-    }
-
-    private static void errorEmbed(GuildMessageReceivedEvent event, String description) {
-        event.getMessage().delete().queue();
-        EmbedBuilder error = new EmbedBuilder();
-        error.setColor(0xf2480a);
-        error.setDescription(description);
-        RestAction<Message> action = event.getChannel().sendMessage(error.build());
-        action.queue((message) -> {
-            //Добавляем реакцию ❌ к сообщению об ошибке
-            message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getMember().getId());
-            message.delete().queueAfter(15, TimeUnit.SECONDS);
-        });
-        error.clear();
     }
 
     public static void setErrorEmbed(String description) {
