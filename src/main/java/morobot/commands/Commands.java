@@ -40,11 +40,11 @@ public class Commands extends ListenerAdapter {
             new ShowAvatar().onAvatarCommand(event, args);
         } else if (command.contains(App.PREFIX + "mute")) {
             new TextMute().onMuteCommand(event, args);
-        } else if (command.contains(App.PREFIX + "play")) {
+        } else if (command.contains(App.PREFIX + "play")) { //music command
             new Play().onPlayCommand(event, args);
-        } else if (command.contains(App.PREFIX + "join")) {
+        } else if (command.contains(App.PREFIX + "join")) { //music command
             new Join().onJoinCommand(event, args);
-        } else if (command.contains(App.PREFIX + "stop")) {
+        } else if (command.contains(App.PREFIX + "stop")) { //music command
             new Stop().onStopCommand(event, args);
         }
     }

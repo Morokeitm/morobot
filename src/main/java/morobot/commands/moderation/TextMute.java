@@ -54,12 +54,15 @@ public class TextMute extends ErrorEmbed {
                     errorEmbed(event, Constants.TOO_MANY_USERS);
                 } else if (users.size() != 0) {
                     id = users.get(0).getId();
+                } else {
+                    member = null;
+                    errorEmbed(event, Constants.CANT_FIND_USER);
                 }
             }
         }
         if (id != null) {
             member = event.getGuild().getMemberById(id);
-        } else member = null;
+        }
     }
 
     private void muteWithTimeSchedule(GuildMessageReceivedEvent event, String[] args) {
@@ -76,8 +79,6 @@ public class TextMute extends ErrorEmbed {
                 errorDescription = member.getUser().getName() + " уже отстранен.";
                 errorEmbed(event, errorDescription);
             }
-        } else {
-            errorEmbed(event, Constants.CANT_FIND_USER);
         }
     }
 
@@ -132,8 +133,6 @@ public class TextMute extends ErrorEmbed {
                         member.getUser().getName() + " (" + member.getNickname() + ")" + " уже отстранен.";
                 errorEmbed(event, errorDescription);
             }
-        } else {
-            errorEmbed(event, Constants.CANT_FIND_USER);
         }
     }
 
