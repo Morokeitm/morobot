@@ -1,14 +1,14 @@
 package morobot.commands.music;
 
 import morobot.commands.Constants;
-import morobot.commands.ErrorEmbed;
+import morobot.commands.CommandsStuff;
 import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class Stop extends ErrorEmbed {
+public class Stop extends CommandsStuff {
 
     public void onStopCommand(GuildMessageReceivedEvent event, String[] args) {
 

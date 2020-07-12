@@ -13,7 +13,7 @@ public class App {
     public static final String PREFIX = "!";
 
     public static void main(String[] args) throws Exception {
-//        final String token = args[0]; Временно не используется
+
         builder = new JDABuilder(AccountType.BOT).setToken(args[0])
                 .setActivity(Activity.watching("Руководство по написанию ботов"))
                 .build();

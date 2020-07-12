@@ -1,7 +1,7 @@
 package morobot.commands.moderation;
 
 import morobot.commands.Constants;
-import morobot.commands.ErrorEmbed;
+import morobot.commands.CommandsStuff;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ClearMessages extends ErrorEmbed {
+public class ClearMessages extends CommandsStuff {
 
     public void onClearCommand(GuildMessageReceivedEvent event, String[] args) {
 

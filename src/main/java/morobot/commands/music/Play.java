@@ -1,7 +1,7 @@
 package morobot.commands.music;
 
 import morobot.commands.Constants;
-import morobot.commands.ErrorEmbed;
+import morobot.commands.CommandsStuff;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Play extends ErrorEmbed {
+public class Play extends CommandsStuff {
 
     private static GuildMessageReceivedEvent currentEvent;
 

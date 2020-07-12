@@ -1,14 +1,14 @@
 package morobot.commands.music;
 
 import morobot.commands.Constants;
-import morobot.commands.ErrorEmbed;
+import morobot.commands.CommandsStuff;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.concurrent.TimeUnit;
 
-public class Join extends ErrorEmbed {
+public class Join extends CommandsStuff {
 
     public void onJoinCommand(GuildMessageReceivedEvent event, String[] args) {
 

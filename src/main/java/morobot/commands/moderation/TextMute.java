@@ -1,7 +1,7 @@
 package morobot.commands.moderation;
 
 import morobot.commands.Constants;
-import morobot.commands.ErrorEmbed;
+import morobot.commands.CommandsStuff;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,12 +9,11 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class TextMute extends ErrorEmbed {
+public class TextMute extends CommandsStuff {
 
     private static Member member;
     private static String id;
@@ -33,35 +32,6 @@ public class TextMute extends ErrorEmbed {
             if (args.length == 3) muteWithTimeSchedule(event, args);
         } else {
             errorEmbed(event, Constants.WRONG_COMMAND);
-        }
-    }
-
-    private void findMemberById(GuildMessageReceivedEvent event, String user) {
-        id = null;
-        if (user.startsWith("<@")) {
-            id = user.startsWith("<@!") ?
-                    user.replace("<@!", "").replace(">", "") :
-                    user.replace("<@", "").replace(">", "");
-        } else if (!user.startsWith("<@")) {
-            List<Member> members = event.getGuild().getMembersByName(user, true);
-            if (members.size() > 1) {
-                errorEmbed(event, Constants.TOO_MANY_MEMBERS);
-            } else if (members.size() != 0) {
-                id = members.get(0).getId();
-            } else {
-                List<Member> users = event.getGuild().getMembersByEffectiveName(user, true);
-                if (users.size() > 1) {
-                    errorEmbed(event, Constants.TOO_MANY_USERS);
-                } else if (users.size() != 0) {
-                    id = users.get(0).getId();
-                } else {
-                    member = null;
-                    errorEmbed(event, Constants.CANT_FIND_USER);
-                }
-            }
-        }
-        if (id != null) {
-            member = event.getGuild().getMemberById(id);
         }
     }
 
@@ -148,6 +118,16 @@ public class TextMute extends ErrorEmbed {
         } else {
             event.getGuild().addRoleToMember(id, role).queue(); //Добавляем роль мута
             roleAddEmbed(event); //Сообщение об отстранении пользователя
+        }
+    }
+
+    private void findMemberById(GuildMessageReceivedEvent event, String user) {
+        id = findMemberId(event, user);
+        if (id == null) {
+            member = null;
+            errorEmbed(event, Constants.CANT_FIND_USER);
+        } else {
+            member = event.getGuild().getMemberById(id);
         }
     }
 

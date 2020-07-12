@@ -10,20 +10,22 @@ public class Constants {
     public static final String DJ_ROLE = "731867396066902076";
     public static final String MUTE_ROLE = "730486590870126623";
     public static final String WRONG_CHANNEL = "Эту команду можно использовать только в канале \"music\"";
+    public static final String CANT_FIND_USER = "Не могу найти этого пользователя на сервере :(";
 
     //Константы класса "TextMute"
     public static final String WRONG_COMMAND = "Команда \"mute\" написана некорректно.\nИспользуй: " + App.PREFIX + "mute [user] [time (optional, min)]";
     public static final String NO_PERMISSIONS_TO_ADDING_ROLES = "У тебя нет прав на добавление ролей.";
-    public static final String CANT_FIND_USER = "Не могу найти этого пользователя на сервере :(";
     public static final String TOO_BIG_MUTE_TIME = "Указано слишком большое время отстранения.\nУкажи в диапазоне [1 - 34560] минут.";
     public static final String WRONG_MUTE_TIME = "Указано некорректное время отстранения\nИспользуй: " + App.PREFIX + "mute [user] [time (optional, min)]\nВремя отстранения, при этом, может быть [1 - 34560] минут.";
 
     //Константы класса "ShowAvatar"
     public static final String NO_AVATAR = "У пользователя отсутствует картинка на аватаре.";
-    public static final String CANT_FIND_MEMBER = "Не могу найти этого пользователя на сервере :(";
     public static final String TOO_MANY_MEMBERS = "Такое имя у нескольких человек в дискорде.\nПопробуй указать имя пользователя на сервере, или упомянуть его через @User."; // + "TextMute"
     public static final String TOO_MANY_USERS = "Такое имя у нескольких человек на сервере.\nПопробуй указать имя пользователя в дискорде, или упомянуть его через @User."; // + "TextMute"
-    public static final String NO_SELF_AVATAR = "У тебя нет картинки на аватаре, что я тебе показать должен?";
+    public static final String NO_SELF_AVATAR = "У тебя нет картинки на аватаре.";
+
+    //Константы класса "UserInfo"
+    public static final String NO_USER_ARG = "Не указан пользователь.";
 
     //Константы класса "ClearMessages"
     public static final String USAGE = "Используй: " + App.PREFIX + "clear [1-99]";

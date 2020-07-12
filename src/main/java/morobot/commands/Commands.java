@@ -8,6 +8,7 @@ import morobot.commands.music.Play;
 import morobot.commands.music.Stop;
 import morobot.commands.user.Information;
 import morobot.commands.user.ShowAvatar;
+import morobot.commands.user.UserInfo;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -36,6 +37,8 @@ public class Commands extends ListenerAdapter {
             new ClearMessages().onClearCommand(event, args);
         } else if (command.contains(App.PREFIX + "info")) {
             new Information().onInfoCommand(event, args);
+        } else if (command.contains(App.PREFIX + "uinfo")) {
+            new UserInfo().onUserInfoCommand(event, args);
         } else if (command.contains(App.PREFIX + "avatar")) {
             new ShowAvatar().onAvatarCommand(event, args);
         } else if (command.contains(App.PREFIX + "mute")) {
