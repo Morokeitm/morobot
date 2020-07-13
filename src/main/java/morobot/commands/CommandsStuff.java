@@ -62,4 +62,16 @@ public class CommandsStuff {
         });
         error.clear();
     }
+
+    protected static void infoEmbed(GuildMessageReceivedEvent event, String description) {
+        event.getMessage().delete().queue();
+        EmbedBuilder info = new EmbedBuilder();
+        info.setColor(0xfcba03);
+        info.setDescription(description);
+        event.getChannel().sendMessage(info.build())
+                .delay(5, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
+        info.clear();
+    }
 }

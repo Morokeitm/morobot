@@ -4,8 +4,10 @@ import morobot.App;
 import morobot.commands.moderation.ClearMessages;
 import morobot.commands.moderation.TextMute;
 import morobot.commands.music.Join;
+import morobot.commands.music.Pause;
 import morobot.commands.music.Play;
 import morobot.commands.music.Stop;
+import morobot.commands.music.Track;
 import morobot.commands.user.Information;
 import morobot.commands.user.ShowAvatar;
 import morobot.commands.user.UserInfo;
@@ -49,6 +51,10 @@ public class Commands extends ListenerAdapter {
             new Join().onJoinCommand(event, args);
         } else if (command.contains(App.PREFIX + "stop")) { //music command
             new Stop().onStopCommand(event, args);
+        } else if (command.contains(App.PREFIX + "track")) { //music command
+            new Track().onTrackCommand(event, args);
+        } else if (command.contains(App.PREFIX + "pause")) { //music command
+            new Pause().onPauseCommand(event, args);
         }
     }
 }

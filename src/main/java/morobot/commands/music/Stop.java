@@ -21,7 +21,7 @@ public class Stop extends CommandsStuff {
                     stopAndClearQueue(event);
                 }
             } else {
-                errorEmbed(event, Constants.NO_PERMISSION_TO_USE_STOP);
+                errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
             }
         } else {
             errorEmbed(event, Constants.WRONG_CHANNEL);

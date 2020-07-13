@@ -25,7 +25,7 @@ public class Join extends CommandsStuff {
 
     private void isConnected(GuildMessageReceivedEvent event) {
         if (event.getGuild().getAudioManager().isConnected()) {
-            alreadyConnectedEmbed(event);
+            infoEmbed(event, Constants.ALREADY_JOINED);
         } else {
             event.getGuild().getAudioManager()
                     .openAudioConnection(event.getGuild().getVoiceChannelById(Constants.MUSIC_CHANNEL_ID));
@@ -43,17 +43,5 @@ public class Join extends CommandsStuff {
                 .flatMap(Message::delete)
                 .queue();
         joined.clear();
-    }
-
-    private void alreadyConnectedEmbed(GuildMessageReceivedEvent event) {
-        event.getMessage().delete().queue();
-        EmbedBuilder succeed = new EmbedBuilder();
-        succeed.setColor(0xfcba03);
-        succeed.setDescription(Constants.ALREADY_JOINED);
-        event.getChannel().sendMessage(succeed.build())
-                .delay(5, TimeUnit.SECONDS)
-                .flatMap(Message::delete)
-                .queue();
-        succeed.clear();
     }
 }
