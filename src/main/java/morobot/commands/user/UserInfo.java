@@ -27,6 +27,8 @@ public class UserInfo extends CommandsStuff {
                 } else {
                     errorEmbed(event, Constants.CANT_FIND_USER);
                 }
+            } else {
+                errorEmbed(event, Constants.CANT_FIND_USER);
             }
         }
     }
@@ -45,7 +47,7 @@ public class UserInfo extends CommandsStuff {
         info.addField("Имя на сервере", member.getEffectiveName(), false);
         info.addField("ID + упоминание", String.format("%s (%s)", user.getId(), member.getAsMention()), false);
         info.addField("Дата создания аккаунта: ", user.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME), true); //user.getTimeCreated().toLocalDate()
-        info.addField("Присоединился к серверу: ", user.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME), true); //member.getTimeJoined().toLocalDate()
+        info.addField("Присоединился к серверу: ", member.getTimeJoined().format(DateTimeFormatter.RFC_1123_DATE_TIME), true); //member.getTimeJoined().toLocalDate()
         info.addField("Роли на сервере: ", roles.size() == 0 ?
                 "Нет" :
                 roles.toString(), true);
