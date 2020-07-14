@@ -6,6 +6,7 @@ import morobot.commands.moderation.TextMute;
 import morobot.commands.music.Join;
 import morobot.commands.music.Pause;
 import morobot.commands.music.Play;
+import morobot.commands.music.Queue;
 import morobot.commands.music.Stop;
 import morobot.commands.music.Track;
 import morobot.commands.user.Information;
@@ -55,6 +56,8 @@ public class Commands extends ListenerAdapter {
             new Track().onTrackCommand(event, args);
         } else if (command.contains(App.PREFIX + "pause")) { //music command
             new Pause().onPauseCommand(event, args);
+        } else if (command.contains(App.PREFIX + "queue")) { //music command
+            new Queue().onQueueCommand(event, args);
         }
     }
 }

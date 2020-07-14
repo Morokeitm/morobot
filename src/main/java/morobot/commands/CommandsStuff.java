@@ -39,7 +39,7 @@ public class CommandsStuff {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
-        error.setTitle(title);
+        error.setTitle(event.getMember().getUser().getName() + ", " + title);
         error.setDescription(description);
         event.getChannel().sendMessage(error.build())
                 .delay(5, TimeUnit.SECONDS)
@@ -52,13 +52,12 @@ public class CommandsStuff {
         event.getMessage().delete().queue();
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(0xf2480a);
-        error.setDescription(description);
+        error.setDescription(event.getMember().getUser().getName() + ", " + description);
         RestAction<Message> action = event.getChannel().sendMessage(error.build());
         action.queue((message) -> {
             //Добавляем реакцию ❌ к сообщению об ошибке
             message.addReaction("❌").queue();
             XReaction.putAndSave(message.getId(), event.getMember().getId());
-            message.delete().queueAfter(15, TimeUnit.SECONDS);
         });
         error.clear();
     }

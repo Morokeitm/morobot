@@ -35,7 +35,7 @@ public class Track extends CommandsStuff {
         if (track != null) {
             viewTrackInfo(event, track);
         } else {
-            infoEmbed(event, Constants.NO_TRACK_TO_VIEW);
+            infoEmbed(event, Constants.NO_TRACK_PLAYING);
         }
     }
 

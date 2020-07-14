@@ -33,7 +33,7 @@ public class Pause extends CommandsStuff {
         if (!event.getGuild().getAudioManager().isConnected()) {
             errorEmbed(event, Constants.NO_CONNECTION);
         } else if (player.getPlayingTrack() == null) {
-            infoEmbed(event, Constants.NO_TRACK_TO_PAUSE);
+            infoEmbed(event, Constants.NO_TRACK_PLAYING);
         } else if (player.isPaused()) {
             infoEmbed(event, Constants.TRACK_ALREADY_PAUSED);
         } else {

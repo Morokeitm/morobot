@@ -34,7 +34,7 @@ public class Play extends CommandsStuff {
                     playSong(event, args[1], manager, player);
                 }
             } else {
-                errorEmbed(event, Constants.USE_JOIN_COMMAND_FIRST);
+                errorEmbed(event, Constants.NO_CONNECTION);
             }
         } else {
             errorEmbed(event, Constants.WRONG_CHANNEL);

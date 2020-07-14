@@ -63,10 +63,11 @@ public class PlayerManager {
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
                 AudioTrack firstTrack = audioPlaylist.getSelectedTrack();
                 if (firstTrack == null) {
-                    firstTrack = audioPlaylist.getTracks().get(0);
+                    firstTrack = audioPlaylist.getTracks().remove(0);
                 }
                 channel.sendMessage("Добавлен в очередь: " + firstTrack.getInfo().title + " (Первый трек из плейлиста " + audioPlaylist.getName() + ")").queue();
                 play(musicManager, firstTrack);
+                audioPlaylist.getTracks().forEach(musicManager.scheduler::queue);
             }
 
             @Override
