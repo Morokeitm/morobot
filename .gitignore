@@ -10,6 +10,7 @@
 *.orig
 test-output/
 target
+.env
 
 # https://github.com/github/gitignore/blob/master/Global/MicrosoftOffice.gitignore
 *.tmp

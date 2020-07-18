@@ -10,11 +10,11 @@ import net.dv8tion.jda.api.entities.Activity;
 
 public class App {
     static JDA builder;
-    public static final String PREFIX = "!";
+    public static final String PREFIX = Config.get("prefix");
 
     public static void main(String[] args) throws Exception {
 
-        builder = new JDABuilder(AccountType.BOT).setToken(args[0])
+        builder = new JDABuilder(AccountType.BOT).setToken(Config.get("token"))
                 .setActivity(Activity.watching("Руководство по написанию ботов"))
                 .build();
 
