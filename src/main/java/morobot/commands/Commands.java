@@ -4,6 +4,7 @@ import morobot.App;
 import morobot.commands.moderation.ClearMessages;
 import morobot.commands.moderation.TextMute;
 import morobot.commands.music.Join;
+import morobot.commands.music.Leave;
 import morobot.commands.music.Pause;
 import morobot.commands.music.Play;
 import morobot.commands.music.Queue;
@@ -58,6 +59,8 @@ public class Commands extends ListenerAdapter {
             new Pause().onPauseCommand(event, args);
         } else if (command.contains(App.PREFIX + "queue")) { //music command
             new Queue().onQueueCommand(event, args);
+        } else if (command.contains(App.PREFIX + "leave")) { //music command
+            new Leave().onLeaveCommand(event, args);
         }
     }
 }

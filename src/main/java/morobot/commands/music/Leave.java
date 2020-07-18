@@ -1,7 +1,7 @@
 package morobot.commands.music;
 
-import morobot.commands.Constants;
 import morobot.commands.CommandsStuff;
+import morobot.commands.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.concurrent.TimeUnit;
 
-public class Join extends CommandsStuff {
+public class Leave extends CommandsStuff {
 
-    public void onJoinCommand(GuildMessageReceivedEvent event, String[] args) {
+    public void onLeaveCommand(GuildMessageReceivedEvent event, String[] args) {
 
         String channelId = event.getChannel().getId();
 
@@ -31,23 +31,22 @@ public class Join extends CommandsStuff {
 
     private void isConnected(GuildMessageReceivedEvent event) {
         if (event.getGuild().getAudioManager().isConnected()) {
-            infoEmbed(event, Constants.ALREADY_JOINED);
+            event.getGuild().getAudioManager().closeAudioConnection();
+            leaveFromMusicChannelEmbed(event);
         } else {
-            event.getGuild().getAudioManager()
-                    .openAudioConnection(event.getGuild().getVoiceChannelById(Constants.MUSIC_CHANNEL_ID));
-            joinedToMusicChannelEmbed(event);
+            infoEmbed(event, Constants.ALREADY_LEFT);
         }
     }
 
-    private void joinedToMusicChannelEmbed(GuildMessageReceivedEvent event) {
+    private void leaveFromMusicChannelEmbed(GuildMessageReceivedEvent event) {
         event.getMessage().delete().queue();
-        EmbedBuilder joined = new EmbedBuilder();
-        joined.setColor(0x14f51b);
-        joined.setDescription(Constants.JOINED);
-        event.getChannel().sendMessage(joined.build())
+        EmbedBuilder left = new EmbedBuilder();
+        left.setColor(0x14f51b);
+        left.setDescription(Constants.LEFT);
+        event.getChannel().sendMessage(left.build())
                 .delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
-        joined.clear();
+        left.clear();
     }
 }

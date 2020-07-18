@@ -49,6 +49,10 @@ public class Constants {
     public static final String JOINED = "Подключился к каналу \"music\"";
     public static final String ALREADY_JOINED = "Я уже подключен к каналу.";
 
+    //Константы для класса "Leave"
+    public static final String LEFT = "Отключился от канала \"music\"";
+    public static final String ALREADY_LEFT = "Я не подключен к каналу \"music\"";
+
     //Константы для класса "Stop"
     public static final String STOP_MUSIC_AND_DELETE_QUEUE = "Воспроизведение остановлено, очередь очищена.";
     public static final String DELETE_QUEUE = "Очередь очищена.";

@@ -15,18 +15,19 @@ public class Stop extends CommandsStuff {
         String channelId = event.getChannel().getId();
 
         if (channelId.equals(Constants.MUSIC_TEXT_CHANNEL_ID)) {
-            if ((event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE)) ||
-                    event.getMember().hasPermission(Permission.MESSAGE_MANAGE))) {
-                if (args.length == 1) {
+            if (args.length == 1) {
+                if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE)) ||
+                        event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
                     stopAndClearQueue(event);
+                } else {
+                    errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
                 }
-            } else {
-                errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
             }
         } else {
             errorEmbed(event, Constants.WRONG_CHANNEL);
         }
     }
+
 
     private void stopAndClearQueue(GuildMessageReceivedEvent event) {
         PlayerManager playerManager = PlayerManager.getInstance();

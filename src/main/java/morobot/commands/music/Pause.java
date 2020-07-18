@@ -16,13 +16,13 @@ public class Pause extends CommandsStuff {
         AudioPlayer player = manager.getGuildMusicManager(event.getGuild()).player;
 
         if (channelId.equals(Constants.MUSIC_TEXT_CHANNEL_ID)) {
-            if ((event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE)) ||
-                    event.getMember().hasPermission(Permission.MESSAGE_MANAGE))) {
-                if (args.length == 1) {
+            if (args.length == 1) {
+                if (event.getMember().hasPermission(Permission.MESSAGE_MANAGE) ||
+                        event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE))) {
                     pauseTrack(event, player);
+                } else {
+                    errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
                 }
-            } else {
-                errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
             }
         } else {
             errorEmbed(event, Constants.WRONG_CHANNEL);
