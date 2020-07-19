@@ -31,6 +31,9 @@ public class Constants {
     public static final String TOO_MANY_USERS = "такое имя у нескольких человек на сервере.\nПопробуй указать имя пользователя в дискорде, или упомянуть его через @User."; // + "TextMute"
     public static final String NO_SELF_AVATAR = "у тебя нет картинки на аватаре.";
 
+    //Константы класса "ShowAvatar"
+    public static final String NO_USER_NAME = "не указано имя пользователя в instagram.";
+
     //Константы класса "ClearMessages"
     public static final String USAGE = "Используй: " + App.PREFIX + "clear [1-99]";
     public static final String NOT_A_DIGIT = "ты указал(а) неправильное число, или вовсе не число.";

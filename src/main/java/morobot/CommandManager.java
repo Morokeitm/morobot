@@ -14,6 +14,7 @@ import morobot.command.commands.music.Play;
 import morobot.command.commands.music.Queue;
 import morobot.command.commands.music.Stop;
 import morobot.command.commands.music.Track;
+import morobot.command.commands.user.Instagram;
 import morobot.command.commands.user.ShowAvatar;
 import morobot.command.commands.user.UserInfo;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -29,6 +30,7 @@ public class CommandManager {
 
     public CommandManager() {
         addCommand(new Help(this));
+        addCommand(new Instagram());
         addCommand(new Ping());
         addCommand(new ShowAvatar());
         addCommand(new UserInfo());
