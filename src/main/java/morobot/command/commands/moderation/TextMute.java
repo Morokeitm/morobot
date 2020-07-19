@@ -1,6 +1,6 @@
 package morobot.command.commands.moderation;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -44,9 +44,7 @@ public class TextMute extends CommandsStuff implements ICommand {
     private void muteWithTimeScheduleDependOnPermissions(CommandContext event, Member member, Role role, String muteTime, String id) {
         /*Только администратор сможет отстранить любого пользователя, кроме администратора.
         Пользователь с правами ролей не сможет отстранить никого старше себя.*/
-        if ((member.hasPermission(Permission.MANAGE_ROLES) &&
-                !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
-                member.hasPermission(Permission.ADMINISTRATOR)) {
+        if (!event.getMember().canInteract(member)) {
             errorDescription = "невозможно отстранить " + (member.getNickname() == null ?
                     member.getUser().getName() :
                     member.getUser().getName() + " (" + member.getNickname() + ")");
@@ -100,9 +98,7 @@ public class TextMute extends CommandsStuff implements ICommand {
     private void muteDependOnPermissions(CommandContext event, Member member, Role role, String id) {
         /*Только администратор сможет отстранить любого пользователя, кроме администратора.
         Пользователь с правами ролей не сможет отстранить никого старше себя.*/
-        if ((member.hasPermission(Permission.MANAGE_ROLES) &&
-                !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
-                member.hasPermission(Permission.ADMINISTRATOR)) {
+        if (!event.getMember().canInteract(member)) {
             errorDescription = "Невозможно отстранить " + (member.getNickname() == null ?
                     member.getUser().getName() :
                     member.getUser().getName() + " (" + member.getNickname() + ")");
@@ -191,7 +187,7 @@ public class TextMute extends CommandsStuff implements ICommand {
             if (event.getArgs().size() == 2) muteWithTimeSchedule(event, event.getArgs());
             return;
         }
-        errorEmbed(event, Constants.WRONG_COMMAND);
+        errorEmbed(event, Constants.WRONG_MUTE_COMMAND);
     }
 
     @Override
@@ -202,8 +198,8 @@ public class TextMute extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Отстраняет указанного участника сервера, выдавая ему роль мута.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + " [user]\", " +
-                "либо \"" + Config.get("prefix") + this.commandName() + " [имя/упоминание участника] [время(мин)]\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\", " +
+                "либо \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника] [1-34560(мин)]\"";
     }
 
     @Override

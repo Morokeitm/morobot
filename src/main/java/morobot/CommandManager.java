@@ -3,6 +3,7 @@ package morobot;
 import morobot.command.CommandContext;
 import morobot.command.ICommand;
 import morobot.command.commands.Help;
+import morobot.command.commands.moderation.Kick;
 import morobot.command.commands.moderation.Ping;
 import morobot.command.commands.moderation.ClearMessages;
 import morobot.command.commands.moderation.TextMute;
@@ -33,6 +34,7 @@ public class CommandManager {
         addCommand(new UserInfo());
         addCommand(new ClearMessages());
         addCommand(new TextMute());
+        addCommand(new Kick());
         addCommand(new Join());
         addCommand(new Leave());
         addCommand(new Pause());
@@ -71,7 +73,7 @@ public class CommandManager {
 
     void handle(GuildMessageReceivedEvent event) {
         String[] args = event.getMessage().getContentRaw()
-                .replaceFirst("(?i)" + Pattern.quote(Config.get("prefix")), "")
+                .replaceFirst("(?i)" + Pattern.quote(App.PREFIX), "")
                 .split("\\s+");
         String command = args[0].toLowerCase();
         ICommand cmd = this.getCommand(command);

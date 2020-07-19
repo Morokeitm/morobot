@@ -1,6 +1,6 @@
 package morobot.command.commands.moderation;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -32,7 +32,7 @@ public class Ping extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает текущий пинг от бота до сервера дискорда.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + "\"";
     }
 
     @Override

@@ -55,17 +55,20 @@ public class Help extends CommandsStuff implements ICommand {
     @Override
     public void commandHandle(CommandContext event) {
         List<String> args = event.getArgs();
+        final int[] i = {0};
 
         if (args.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             builder.append("Список команд:\n");
             manager.getCommands().stream()
                     .map(ICommand::commandName)
-                    .forEach(command -> builder
+                    .forEach(command -> {
+                        i[0]++;
+                        builder
                             .append("\"")
                             .append(Config.get("prefix"))
                             .append(command)
-                            .append("\", "));
+                            .append("\"" + (i[0] % 7 == 0 ? "\n" : "  "));});
             commandListEmbed(event, builder.toString());
             return;
         }

@@ -1,7 +1,7 @@
 package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -56,7 +56,7 @@ public class Pause extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Ставит на паузу текущий трек.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + "\"";
     }
 
     @Override

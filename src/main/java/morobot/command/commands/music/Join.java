@@ -1,6 +1,6 @@
 package morobot.command.commands.music;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -62,7 +62,7 @@ public class Join extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Подключает бота к каналу \"music\".\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + "\"";
     }
 
     @Override

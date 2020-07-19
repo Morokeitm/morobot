@@ -1,6 +1,6 @@
 package morobot.command.commands.user;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -68,8 +68,8 @@ public class ShowAvatar extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает картинку на аватаре участника сервера.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\", " +
-                "либо \"" + Config.get("prefix") + this.commandName() + " [имя/упоминание участника]\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + "\", " +
+                "либо \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\"";
     }
 
     @Override

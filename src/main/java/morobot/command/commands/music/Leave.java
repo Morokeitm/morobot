@@ -1,6 +1,6 @@
 package morobot.command.commands.music;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -59,7 +59,7 @@ public class Leave extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Отключает бота от канала \"music\".\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + "\"";
     }
 
     @Override

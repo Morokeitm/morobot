@@ -1,6 +1,6 @@
 package morobot.command.commands.moderation;
 
-import morobot.Config;
+import morobot.App;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -63,7 +63,7 @@ public class ClearMessages extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Удаляет указанное количество последних сообщений.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + " [1-99]\"";
+                "Использование: \"" + App.PREFIX + this.commandName() + " [1-99]\"";
     }
 
     @Override
