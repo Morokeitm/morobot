@@ -1,6 +1,7 @@
 package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -38,8 +39,7 @@ public class Pause extends CommandsStuff implements ICommand {
             return;
         }
         if (event.getArgs().size() == 0) {
-            if (event.getMember().hasPermission(Permission.MESSAGE_MANAGE) ||
-                    event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE))) {
+            if (hasPermission(event)) {
                 pauseTrack(event, player);
                 return;
             }
@@ -51,5 +51,17 @@ public class Pause extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "pause";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Ставит на паузу текущий трек.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return event.getMember().hasPermission(Permission.MESSAGE_MANAGE) ||
+                event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE));
     }
 }

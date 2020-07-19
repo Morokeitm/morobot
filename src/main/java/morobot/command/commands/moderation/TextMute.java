@@ -1,5 +1,6 @@
 package morobot.command.commands.moderation;
 
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -46,7 +47,7 @@ public class TextMute extends CommandsStuff implements ICommand {
         if ((member.hasPermission(Permission.MANAGE_ROLES) &&
                 !event.getMember().hasPermission(Permission.ADMINISTRATOR)) ||
                 member.hasPermission(Permission.ADMINISTRATOR)) {
-            errorDescription = "Невозможно отстранить " + (member.getNickname() == null ?
+            errorDescription = "невозможно отстранить " + (member.getNickname() == null ?
                     member.getUser().getName() :
                     member.getUser().getName() + " (" + member.getNickname() + ")");
             errorEmbed(event, errorDescription);
@@ -83,7 +84,6 @@ public class TextMute extends CommandsStuff implements ICommand {
     private void muteWithoutTimeSchedule(CommandContext event, List<String> args) {
         findMemberById(event, args.get(0));
         if (member != null) {
-
             Role role = event.getGuild().getRoleById(Constants.MUTE_ROLE);
 
             if (!member.getRoles().contains(role)) {
@@ -179,9 +179,8 @@ public class TextMute extends CommandsStuff implements ICommand {
 
     @Override
     public void commandHandle(CommandContext event) {
-        Member member = event.getMember();
 
-        if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+        if (!hasPermission(event)) {
             errorEmbed(event, Constants.NO_PERMISSIONS_TO_ADDING_ROLES);
             return;
         }
@@ -198,5 +197,17 @@ public class TextMute extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "mute";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Отстраняет указанного участника сервера, выдавая ему роль мута.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + " [user]\", " +
+                "либо \"" + Config.get("prefix") + this.commandName() + " [имя/упоминание участника] [время(мин)]\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return event.getMember().hasPermission(Permission.MANAGE_ROLES);
     }
 }

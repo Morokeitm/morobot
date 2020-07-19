@@ -1,5 +1,6 @@
 package morobot.command.commands.music;
 
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -43,8 +44,7 @@ public class Stop extends CommandsStuff implements ICommand {
             return;
         }
         if (event.getArgs().size() == 0) {
-            if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE)) ||
-                    event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+            if (hasPermission(event)) {
                 stopAndClearQueue(event);
                 return;
             }
@@ -55,5 +55,17 @@ public class Stop extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "stop";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Останавливает текущий трек и удаляет все треки из очереди.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return event.getMember().hasPermission(Permission.MESSAGE_MANAGE) ||
+                event.getMember().getRoles().contains(event.getGuild().getRoleById(Constants.DJ_ROLE));
     }
 }

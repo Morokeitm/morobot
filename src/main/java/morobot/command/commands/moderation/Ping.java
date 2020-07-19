@@ -1,5 +1,6 @@
 package morobot.command.commands.moderation;
 
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -12,7 +13,7 @@ public class Ping extends CommandsStuff implements ICommand {
     public void commandHandle(CommandContext event) {
         JDA jda = event.getJDA();
 
-        if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)){
+        if (!hasPermission(event)){
             errorEmbed(event, Constants.NO_PERMISSION_TO_USE_COMMAND);
             return;
         }
@@ -26,5 +27,16 @@ public class Ping extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "ping";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Показывает текущий пинг от бота до сервера дискорда.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return event.getMember().hasPermission(Permission.ADMINISTRATOR);
     }
 }

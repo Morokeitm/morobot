@@ -27,7 +27,7 @@ public class Constants {
     public static final String NO_SELF_AVATAR = "у тебя нет картинки на аватаре.";
 
     //Константы класса "UserInfo"
-    public static final String NO_USER_ARG = "Не указан пользователь.";
+//    public static final String NO_USER_ARG = "Не указан пользователь.";
 
     //Константы класса "ClearMessages"
     public static final String USAGE = "Используй: " + App.PREFIX + "clear [1-99]";

@@ -71,7 +71,7 @@ public class CommandsStuff {
         info.setColor(0xfcba03);
         info.setDescription(description);
         event.getChannel().sendMessage(info.build())
-                .delay(5, TimeUnit.SECONDS)
+                .delay(3, TimeUnit.SECONDS)
                 .flatMap(Message::delete)
                 .queue();
         info.clear();

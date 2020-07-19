@@ -2,6 +2,7 @@ package morobot;
 
 import morobot.command.CommandContext;
 import morobot.command.ICommand;
+import morobot.command.commands.Help;
 import morobot.command.commands.moderation.Ping;
 import morobot.command.commands.moderation.ClearMessages;
 import morobot.command.commands.moderation.TextMute;
@@ -12,7 +13,6 @@ import morobot.command.commands.music.Play;
 import morobot.command.commands.music.Queue;
 import morobot.command.commands.music.Stop;
 import morobot.command.commands.music.Track;
-import morobot.command.commands.user.Information;
 import morobot.command.commands.user.ShowAvatar;
 import morobot.command.commands.user.UserInfo;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -27,8 +27,8 @@ public class CommandManager {
     private final List<ICommand> commands = new ArrayList<>();
 
     public CommandManager() {
+        addCommand(new Help(this));
         addCommand(new Ping());
-        addCommand(new Information());
         addCommand(new ShowAvatar());
         addCommand(new UserInfo());
         addCommand(new ClearMessages());
@@ -54,8 +54,12 @@ public class CommandManager {
         commands.add(command);
     }
 
+    public List<ICommand> getCommands() {
+        return commands;
+    }
+
     @Nullable
-    private ICommand getCommand(String search) {
+    public ICommand getCommand(String search) {
         String searchInLowerCase = search.toLowerCase();
         for (ICommand command : this.commands) {
             if (command.commandName().equals(searchInLowerCase) || command.getAliases().contains(searchInLowerCase)) {

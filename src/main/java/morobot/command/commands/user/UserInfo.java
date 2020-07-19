@@ -1,5 +1,6 @@
 package morobot.command.commands.user;
 
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.ICommand;
@@ -65,5 +66,17 @@ public class UserInfo extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "uinfo";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Показывает информацию об участнике сервера.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\", " +
+                "либо \"" + Config.get("prefix") + this.commandName() + " [имя/упоминание участника]\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return true;
     }
 }

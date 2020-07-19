@@ -1,9 +1,13 @@
 package morobot.command;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import me.duncte123.botcommons.commands.ICommandContext;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandContext implements ICommandContext {
@@ -25,7 +29,21 @@ public class CommandContext implements ICommandContext {
         return this.event;
     }
 
+    @Override
+    public Member getMember() {
+        return event.getMember();
+    }
+
+    @Override
+    public User getAuthor() {
+        return event.getAuthor();
+    }
+
     public List<String> getArgs() {
         return args;
+    }
+
+    public EnumSet<Permission> getPermissions() {
+        return this.getMember().getPermissions();
     }
 }

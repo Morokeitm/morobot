@@ -1,6 +1,7 @@
 package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -56,5 +57,16 @@ public class Track extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "track";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Показывет информацию о текущем треке.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return true;
     }
 }

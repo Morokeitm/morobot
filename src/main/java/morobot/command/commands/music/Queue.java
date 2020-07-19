@@ -2,6 +2,7 @@ package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.Constants;
@@ -64,5 +65,16 @@ public class Queue extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "queue";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Показывает текущую очередь треков.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return true;
     }
 }

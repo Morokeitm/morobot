@@ -1,6 +1,7 @@
 package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -83,5 +84,17 @@ public class Play extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "play";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Ставит в очередь указанный трек, либо снимает текущий трек с паузы.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\", " +
+                "либо \"" + Config.get("prefix") + this.commandName() + " [ссылка]\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return true;
     }
 }

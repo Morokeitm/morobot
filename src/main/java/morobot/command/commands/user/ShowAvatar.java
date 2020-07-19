@@ -1,5 +1,6 @@
 package morobot.command.commands.user;
 
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -14,7 +15,6 @@ public class ShowAvatar extends CommandsStuff implements ICommand {
         String memberId = findMemberId(event, user);
 
         if (memberId == null) {
-            errorEmbed(event, Constants.CANT_FIND_USER);
             return;
         }
         Member member = event.getGuild().getMemberById(memberId);
@@ -63,5 +63,17 @@ public class ShowAvatar extends CommandsStuff implements ICommand {
     @Override
     public String commandName() {
         return "avatar";
+    }
+
+    @Override
+    public String getHelp() {
+        return "Показывает картинку на аватаре участника сервера.\n\n" +
+                "Использование: \"" + Config.get("prefix") + this.commandName() + "\", " +
+                "либо \"" + Config.get("prefix") + this.commandName() + " [имя/упоминание участника]\"";
+    }
+
+    @Override
+    public boolean hasPermission(CommandContext event) {
+        return true;
     }
 }
