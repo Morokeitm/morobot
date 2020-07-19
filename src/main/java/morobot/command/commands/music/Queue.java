@@ -1,49 +1,33 @@
-package morobot.commands.music;
+package morobot.command.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import morobot.commands.CommandsStuff;
-import morobot.commands.Constants;
+import morobot.command.CommandContext;
+import morobot.command.CommandsStuff;
+import morobot.command.Constants;
+import morobot.command.ICommand;
 import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
-public class Queue extends CommandsStuff {
+public class Queue extends CommandsStuff implements ICommand {
 
-    public void onQueueCommand(GuildMessageReceivedEvent event, String[] args) {
-
-        String channelId = event.getChannel().getId();
-
-        if (channelId.equals(Constants.MUSIC_TEXT_CHANNEL_ID)) {
-            if (args.length == 1) {
-                if (event.getGuild().getAudioManager().isConnected()) {
-                    getCurrentQueue(event);
-                } else {
-                    errorEmbed(event, Constants.NO_CONNECTION);
-                }
-            }
-        } else {
-            errorEmbed(event, Constants.WRONG_CHANNEL);
-        }
-    }
-
-    private void getCurrentQueue(GuildMessageReceivedEvent event) {
+    private void getCurrentQueue(CommandContext event) {
         PlayerManager playerManager = PlayerManager.getInstance();
         GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
         BlockingQueue<AudioTrack> queue = musicManager.scheduler.getQueue();
 
         if (!queue.isEmpty()) {
             viewQueueInfo(event, queue);
-        } else {
-            infoEmbed(event, Constants.QUEUE_IS_EMPTY);
+            return;
         }
+        infoEmbed(event, Constants.QUEUE_IS_EMPTY);
     }
 
-    private static void viewQueueInfo(GuildMessageReceivedEvent event, BlockingQueue<AudioTrack> queue) {
+    private static void viewQueueInfo(CommandContext event, BlockingQueue<AudioTrack> queue) {
         event.getMessage().delete().queue();
         int trackCount = Math.min(queue.size(), 10);
         ArrayList<AudioTrack> tracks = new ArrayList<>(queue);
@@ -60,4 +44,25 @@ public class Queue extends CommandsStuff {
         currentQueue.clear();
     }
 
+    @Override
+    public void commandHandle(CommandContext event) {
+        String channelId = event.getChannel().getId();
+
+        if (!channelId.equals(Constants.MUSIC_TEXT_CHANNEL_ID)) {
+            errorEmbed(event, Constants.WRONG_CHANNEL);
+            return;
+        }
+        if (event.getArgs().size() == 0) {
+            if (event.getGuild().getAudioManager().isConnected()) {
+                getCurrentQueue(event);
+                return;
+            }
+            errorEmbed(event, Constants.NO_CONNECTION);
+        }
+    }
+
+    @Override
+    public String commandName() {
+        return "queue";
+    }
 }

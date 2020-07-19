@@ -1,4 +1,4 @@
-package morobot.commands;
+package morobot.command;
 
 import morobot.App;
 

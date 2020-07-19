@@ -1,4 +1,4 @@
-package morobot.commands;
+package morobot.command;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;

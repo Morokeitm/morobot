@@ -1,39 +1,19 @@
-package morobot.commands.user;
+package morobot.command.commands.user;
 
-import morobot.commands.CommandsStuff;
-import morobot.commands.Constants;
+import morobot.command.CommandContext;
+import morobot.command.CommandsStuff;
+import morobot.command.ICommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class UserInfo extends CommandsStuff {
+public class UserInfo extends CommandsStuff implements ICommand {
 
-    public void onUserInfoCommand(GuildMessageReceivedEvent event, String[] args) {
-
-        if (args.length < 2) {
-            userInfoEmbed(event, event.getAuthor(), event.getMember());
-        } else if (args.length == 2) {
-            String id = findMemberId(event, args[1]);
-            if (id != null) {
-                User user = event.getGuild().getMemberById(id).getUser();
-                Member member = event.getGuild().getMemberById(id);
-                if (member != null) {
-                    userInfoEmbed(event, user, member);
-                } else {
-                    errorEmbed(event, Constants.CANT_FIND_USER);
-                }
-            } else {
-                errorEmbed(event, Constants.CANT_FIND_USER);
-            }
-        }
-    }
-
-    private void userInfoEmbed(GuildMessageReceivedEvent event, User user, Member member) {
+    private void userInfoEmbed(CommandContext event, User user, Member member) {
         ArrayList<String> roles = new ArrayList<>();
         for (Role role : member.getRoles()) {
             roles.add(role.getName());
@@ -60,5 +40,30 @@ public class UserInfo extends CommandsStuff {
                 "Нет", true);
         event.getChannel().sendMessage(info.build()).queue();
         info.clear();
+    }
+
+    @Override
+    public void commandHandle(CommandContext event) {
+
+        if (event.getArgs().size() == 0) {
+            userInfoEmbed(event, event.getAuthor(), event.getMember());
+            return;
+        }
+        if (event.getArgs().size() == 1) {
+            String arg = event.getArgs().get(0);
+            String id = findMemberId(event, arg);
+            if (id != null) {
+                User user = event.getGuild().getMemberById(id).getUser();
+                Member member = event.getGuild().getMemberById(id);
+                if (member != null) {
+                    userInfoEmbed(event, user, member);
+                }
+            }
+        }
+    }
+
+    @Override
+    public String commandName() {
+        return "uinfo";
     }
 }

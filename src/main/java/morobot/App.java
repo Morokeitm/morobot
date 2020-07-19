@@ -1,7 +1,6 @@
 package morobot;
 
-import morobot.commands.Commands;
-import morobot.commands.XReaction;
+import morobot.command.XReaction;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -19,7 +18,7 @@ public class App {
                 .build();
 
         builder.getPresence().setStatus(OnlineStatus.ONLINE);
-        builder.addEventListener(new Commands());
+        builder.addEventListener(new Listener());
         builder.addEventListener(new XReaction());
     }
 }
