@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer player;
     private final BlockingQueue<AudioTrack> queue;
-    private static String trackEmbedId;
+    private static String trackEmbedId = null;
 
     /**
      * @param player The audio player this scheduler uses
@@ -79,7 +79,6 @@ public class TrackScheduler extends AudioEventAdapter {
         pause.setDescription(Constants.TRACK_PAUSED);
         RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(pause.build());
         action.queue((message) -> {
-            //Добавляем реакцию ▶ к сообщению о паузе.
             message.addReaction("▶").queue();
             message.addReaction("\uD83D\uDCCB").queue();
             trackEmbedId = message.getId();
@@ -103,7 +102,6 @@ public class TrackScheduler extends AudioEventAdapter {
         play.addField("Продолжительность:", min + ":" + sec, false);
         RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
         action.queue((message) -> {
-            //Добавляем реакцию ⏸ к сообщению о треке.
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();
             message.addReaction("\uD83D\uDCCB").queue();
@@ -126,7 +124,6 @@ public class TrackScheduler extends AudioEventAdapter {
         play.addField("Продолжительность:", min + ":" + sec, false);
         RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
         action.queue((message) -> {
-            //Добавляем реакцию ⏸ к сообщению о треке.
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();
             message.addReaction("\uD83D\uDCCB").queue();

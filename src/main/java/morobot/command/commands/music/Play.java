@@ -1,7 +1,12 @@
 package morobot.command.commands.music;
 
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import morobot.App;
+import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
@@ -10,6 +15,9 @@ import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -17,16 +25,59 @@ import java.util.concurrent.TimeUnit;
 public class Play extends CommandsStuff implements ICommand {
 
     private static CommandContext currentEvent;
+    private final YouTube youTube;
 
-    private void playSong(CommandContext event, String url, PlayerManager manager, AudioPlayer player) {
-        String input = String.join(" ", url);
+    public Play() {
+        YouTube temp = null;
+        try {
+            temp = new YouTube.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance(),
+                    null
+            )
+                    .setApplicationName("MoroBot")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        youTube = temp;
+    }
 
-        if (!isURL(input) && !input.startsWith("ytsearch:")) {
-            errorEmbed(event, Constants.NOT_AN_URL);
-            return;
+    private void playSong(CommandContext event, List<String> args, PlayerManager manager, AudioPlayer player) {
+        String input = String.join(" ", args);
+        if (!isURL(input)) {
+            String ytSearch = searchYoutube(input);
+            if (ytSearch == null) {
+                errorEmbed(event, Constants.FAILED_SEARCH_RESULTS);
+                return;
+            }
+            input = ytSearch;
         }
         manager.loadAndPlay(event.getChannel(), input);
         player.setVolume(10);
+    }
+
+    @Nullable
+    private String searchYoutube(String target) {
+        try {
+            List<SearchResult> results = youTube.search()
+                    .list("id,snippet")
+                    .setQ(target)
+                    .setMaxResults(1L)
+                    .setType("video")
+                    .setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)")
+                    .setKey(Config.get("youtube_key"))
+                    .execute()
+                    .getItems();
+            if (!results.isEmpty()) {
+                String videoId = results.get(0).getId().getVideoId();
+                return "https://www.youtube.com/watch?v=" + videoId;
+            }
+            errorEmbed(currentEvent, Constants.FAILED_SEARCH_RESULTS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private boolean isURL(String url) {
@@ -80,9 +131,7 @@ public class Play extends CommandsStuff implements ICommand {
             }
             errorEmbed(event, Constants.NO_URL);
         }
-        if (event.getArgs().size() == 1) {
-            playSong(event, event.getArgs().get(0), manager, player);
-        }
+        playSong(event, event.getArgs(), manager, player);
     }
 
     @Override

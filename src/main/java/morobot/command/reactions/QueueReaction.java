@@ -24,11 +24,6 @@ public class QueueReaction implements IReaction {
         PlayerManager playerManager = PlayerManager.getInstance();
         GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
         BlockingQueue<AudioTrack> queue = musicManager.scheduler.getQueue();
-
-        if (queue.isEmpty()) {
-            event.getReaction().removeReaction(event.getAuthor()).queue();
-            return;
-        }
         event.getReaction().removeReaction(event.getAuthor()).queue();
         viewQueueInfo(event, queue);
     }
@@ -48,12 +43,19 @@ public class QueueReaction implements IReaction {
         ArrayList<AudioTrack> tracks = new ArrayList<>(queue);
 
         EmbedBuilder currentQueue = new EmbedBuilder();
-        currentQueue.setColor(0x2374de);
-        currentQueue.setTitle("Текущая очередь (всего треков: " + queue.size() + ")");
-        for (int i = 0; i < trackCount; i++) {
-            AudioTrack track = tracks.get(i);
-            AudioTrackInfo trackInfo = track.getInfo();
-            currentQueue.appendDescription((i + 1) + ") " + trackInfo.title + "\n\n");
+        if (queue.isEmpty()) {
+            currentQueue.setColor(0xf7f7f7);
+            currentQueue.setDescription("Тут пусто ¯\\_(ツ)_/¯");
+        } else {
+            if (queue.size() < 3) currentQueue.setColor(0x61ff5e);
+            if (queue.size() > 2 && queue.size() < 7) currentQueue.setColor(0xf7e85c);
+            if (queue.size() > 6) currentQueue.setColor(0xf7685e);
+            currentQueue.setTitle("Текущая очередь (всего треков: " + queue.size() + ")");
+            for (int i = 0; i < trackCount; i++) {
+                AudioTrack track = tracks.get(i);
+                AudioTrackInfo trackInfo = track.getInfo();
+                currentQueue.appendDescription((i + 1) + ") " + trackInfo.title + "\n\n");
+            }
         }
         event.getChannel().sendMessage(currentQueue.build())
                 .delay(10, TimeUnit.SECONDS)

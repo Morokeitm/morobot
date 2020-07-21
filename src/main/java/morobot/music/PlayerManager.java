@@ -9,12 +9,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import morobot.command.commands.music.Play;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerManager {
     private static PlayerManager instance;
@@ -82,7 +84,10 @@ public class PlayerManager {
 
             @Override
             public void loadFailed(FriendlyException e) {
-                channel.sendMessage("Не могу проиграть трек: " + e.getMessage()).queue();
+                channel.sendMessage("Не могу проиграть трек: " + e.getMessage())
+                        .delay(10, TimeUnit.SECONDS)
+                        .flatMap(Message::delete)
+                        .queue();
             }
         });
     }
