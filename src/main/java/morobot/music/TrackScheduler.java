@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import morobot.Listener;
 import morobot.command.Constants;
+import morobot.command.commands.music.Play;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -59,9 +60,15 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (trackEmbedId != null) {
-            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            Listener.messageEvent
+                    .getGuild()
+                    .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                    .deleteMessageById(trackEmbedId)
+                    .queue();
             trackEmbedId = null;
         }
+        Play.getUsers().remove(0);
+        Play.getUrlAdresses().remove(0);
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             nextTrack();
@@ -71,13 +78,20 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onPlayerPause(AudioPlayer player) {
         if (trackEmbedId != null) {
-            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            Listener.messageEvent
+                    .getGuild()
+                    .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                    .deleteMessageById(trackEmbedId)
+                    .queue();
             trackEmbedId = null;
         }
         EmbedBuilder pause = new EmbedBuilder();
         pause.setColor(0xfcba03);
         pause.setDescription(Constants.TRACK_PAUSED);
-        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(pause.build());
+        RestAction<Message> action = Listener.messageEvent
+                .getGuild()
+                .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                .sendMessage(pause.build());
         action.queue((message) -> {
             message.addReaction("▶").queue();
             message.addReaction("\uD83D\uDCCB").queue();
@@ -89,7 +103,11 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onPlayerResume(AudioPlayer player) {
         if (trackEmbedId != null) {
-            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            Listener.messageEvent
+                    .getGuild()
+                    .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                    .deleteMessageById(trackEmbedId)
+                    .queue();
             trackEmbedId = null;
         }
         final AudioTrack track = player.getPlayingTrack();
@@ -98,9 +116,14 @@ public class TrackScheduler extends AudioEventAdapter {
 
         EmbedBuilder play = new EmbedBuilder();
         play.setColor(0x2374de);
-        play.addField("Сейчас играет:", track.getInfo().title, false);
-        play.addField("Продолжительность:", min + ":" + sec, false);
-        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
+        play.setFooter("Сейчас играет");
+        play.setTitle(track.getInfo().title, Play.getUrlAdresses().get(0));
+        play.addField("Продолжительность:", min + ":" + sec, true);
+        play.addField("Заказал:", Play.getUsers().get(0).getAsMention(), true);
+        RestAction<Message> action = Listener.messageEvent
+                .getGuild()
+                .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                .sendMessage(play.build());
         action.queue((message) -> {
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();
@@ -113,16 +136,25 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (trackEmbedId != null) {
-            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            Listener.messageEvent
+                    .getGuild()
+                    .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                    .deleteMessageById(trackEmbedId)
+                    .queue();
             trackEmbedId = null;
         }
         String min = Long.toString(track.getDuration() / 60000);
         String sec = Long.toString(track.getDuration() % 60000 / 1000);
         EmbedBuilder play = new EmbedBuilder();
         play.setColor(0x2374de);
-        play.addField("Сейчас играет:", track.getInfo().title, false);
-        play.addField("Продолжительность:", min + ":" + sec, false);
-        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
+        play.setFooter("Сейчас играет");
+        play.setTitle(track.getInfo().title, Play.getUrlAdresses().get(0));
+        play.addField("Продолжительность:", min + ":" + sec, true);
+        play.addField("Заказал:", Play.getUsers().get(0).getAsMention(), true);
+        RestAction<Message> action = Listener.messageEvent
+                .getGuild()
+                .getTextChannelById(Constants.MUSIC_TEXT_CHANNEL_ID)
+                .sendMessage(play.build());
         action.queue((message) -> {
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();

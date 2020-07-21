@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import morobot.command.Constants;
 import morobot.command.IReaction;
 import morobot.command.ReactionContext;
+import morobot.command.commands.music.Play;
 import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -54,7 +55,7 @@ public class QueueReaction implements IReaction {
             for (int i = 0; i < trackCount; i++) {
                 AudioTrack track = tracks.get(i);
                 AudioTrackInfo trackInfo = track.getInfo();
-                currentQueue.appendDescription((i + 1) + ") " + trackInfo.title + "\n\n");
+                currentQueue.appendDescription((i + 1) + ") " + trackInfo.title + " [" + Play.getUsers().get(i + 1).getAsMention() + "]" + "\n\n");
             }
         }
         event.getChannel().sendMessage(currentQueue.build())

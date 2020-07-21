@@ -14,7 +14,9 @@ import morobot.command.ICommand;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -26,6 +28,8 @@ public class Play extends CommandsStuff implements ICommand {
 
     private static CommandContext currentEvent;
     private final YouTube youTube;
+    private static List<User> users = new ArrayList<>();
+    private static List <String> urlAdresses = new ArrayList<>();
 
     public Play() {
         YouTube temp = null;
@@ -43,6 +47,14 @@ public class Play extends CommandsStuff implements ICommand {
         youTube = temp;
     }
 
+    public static List<User> getUsers() {
+        return users;
+    }
+
+    public static List<String> getUrlAdresses() {
+        return urlAdresses;
+    }
+
     private void playSong(CommandContext event, List<String> args, PlayerManager manager, AudioPlayer player) {
         String input = String.join(" ", args);
         if (!isURL(input)) {
@@ -53,6 +65,8 @@ public class Play extends CommandsStuff implements ICommand {
             }
             input = ytSearch;
         }
+        urlAdresses.add(input);
+        users.add(event.getAuthor());
         manager.loadAndPlay(event.getChannel(), input);
         player.setVolume(10);
     }
@@ -73,7 +87,6 @@ public class Play extends CommandsStuff implements ICommand {
                 String videoId = results.get(0).getId().getVideoId();
                 return "https://www.youtube.com/watch?v=" + videoId;
             }
-            errorEmbed(currentEvent, Constants.FAILED_SEARCH_RESULTS);
         } catch (Exception e) {
             e.printStackTrace();
         }
