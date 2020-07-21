@@ -4,6 +4,11 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import morobot.Listener;
+import morobot.command.Constants;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.requests.RestAction;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,6 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer player;
     private final BlockingQueue<AudioTrack> queue;
+    private static String trackEmbedId;
 
     /**
      * @param player The audio player this scheduler uses
@@ -52,9 +58,80 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        if (trackEmbedId != null) {
+            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            trackEmbedId = null;
+        }
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             nextTrack();
         }
+    }
+
+    @Override
+    public void onPlayerPause(AudioPlayer player) {
+        if (trackEmbedId != null) {
+            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            trackEmbedId = null;
+        }
+        EmbedBuilder pause = new EmbedBuilder();
+        pause.setColor(0xfcba03);
+        pause.setDescription(Constants.TRACK_PAUSED);
+        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(pause.build());
+        action.queue((message) -> {
+            //Добавляем реакцию ▶ к сообщению о паузе.
+            message.addReaction("▶").queue();
+            message.addReaction("\uD83D\uDCCB").queue();
+            trackEmbedId = message.getId();
+        });
+        pause.clear();
+    }
+
+    @Override
+    public void onPlayerResume(AudioPlayer player) {
+        if (trackEmbedId != null) {
+            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            trackEmbedId = null;
+        }
+        final AudioTrack track = player.getPlayingTrack();
+        String min = Long.toString(track.getDuration() / 60000);
+        String sec = Long.toString(track.getDuration() % 60000 / 1000);
+
+        EmbedBuilder play = new EmbedBuilder();
+        play.setColor(0x2374de);
+        play.addField("Сейчас играет:", track.getInfo().title, false);
+        play.addField("Продолжительность:", min + ":" + sec, false);
+        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
+        action.queue((message) -> {
+            //Добавляем реакцию ⏸ к сообщению о треке.
+            message.addReaction("⏸").queue();
+            message.addReaction("⏩").queue();
+            message.addReaction("\uD83D\uDCCB").queue();
+            trackEmbedId = message.getId();
+        });
+        play.clear();
+    }
+
+    @Override
+    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        if (trackEmbedId != null) {
+            Listener.messageEvent.getChannel().deleteMessageById(trackEmbedId).queue();
+            trackEmbedId = null;
+        }
+        String min = Long.toString(track.getDuration() / 60000);
+        String sec = Long.toString(track.getDuration() % 60000 / 1000);
+        EmbedBuilder play = new EmbedBuilder();
+        play.setColor(0x2374de);
+        play.addField("Сейчас играет:", track.getInfo().title, false);
+        play.addField("Продолжительность:", min + ":" + sec, false);
+        RestAction<Message> action = Listener.messageEvent.getChannel().sendMessage(play.build());
+        action.queue((message) -> {
+            //Добавляем реакцию ⏸ к сообщению о треке.
+            message.addReaction("⏸").queue();
+            message.addReaction("⏩").queue();
+            message.addReaction("\uD83D\uDCCB").queue();
+            trackEmbedId = message.getId();
+        });
+        play.clear();
     }
 }

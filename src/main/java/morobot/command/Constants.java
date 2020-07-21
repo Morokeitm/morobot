@@ -10,7 +10,7 @@ public class Constants {
     public static final String DJ_ROLE = "731867396066902076";
     public static final String MUTE_ROLE = "730486590870126623";
     public static final String WRONG_CHANNEL = "эту команду можно использовать только в канале \"music\".";
-    public static final String CANT_FIND_USER = "такого пользователя нет на сервере.";
+    public static final String CANT_FIND_USER = "такого пользователя нет на сервере!\n\n(╯°□°）╯︵ ┻━┻";
     public static final String NO_PERMISSION_TO_USE_COMMAND = "у тебя недостаточно прав для использования этой команды.";
     public static final String NO_CONNECTION = "я не подключен к каналу \"music\". Для подключения используй команду !join.";
 

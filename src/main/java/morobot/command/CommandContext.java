@@ -1,10 +1,8 @@
 package morobot.command;
 
-import java.util.EnumSet;
 import java.util.List;
 
 import me.duncte123.botcommons.commands.ICommandContext;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -41,9 +39,5 @@ public class CommandContext implements ICommandContext {
 
     public List<String> getArgs() {
         return args;
-    }
-
-    public EnumSet<Permission> getPermissions() {
-        return this.getMember().getPermissions();
     }
 }

@@ -9,6 +9,9 @@ import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
+
+import java.util.concurrent.TimeUnit;
 
 public class Stop extends CommandsStuff implements ICommand {
 
@@ -31,7 +34,10 @@ public class Stop extends CommandsStuff implements ICommand {
         } else {
             added.setDescription(Constants.STOP_MUSIC_AND_DELETE_QUEUE);
         }
-        event.getChannel().sendMessage(added.build()).queue();
+        event.getChannel().sendMessage(added.build())
+                .delay(3, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
         added.clear();
     }
 

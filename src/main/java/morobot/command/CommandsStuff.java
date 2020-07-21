@@ -1,5 +1,6 @@
 package morobot.command;
 
+import morobot.command.reactions.DeleteReaction;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -60,7 +61,7 @@ public class CommandsStuff {
         action.queue((message) -> {
             //Добавляем реакцию ❌ к сообщению об ошибке
             message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getMember().getId());
+            DeleteReaction.putAndSave(message.getId(), event.getMember().getId());
         });
         error.clear();
     }

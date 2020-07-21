@@ -9,11 +9,9 @@ import morobot.command.commands.moderation.ClearMessages;
 import morobot.command.commands.moderation.TextMute;
 import morobot.command.commands.music.Join;
 import morobot.command.commands.music.Leave;
-import morobot.command.commands.music.Pause;
 import morobot.command.commands.music.Play;
 import morobot.command.commands.music.Queue;
 import morobot.command.commands.music.Stop;
-import morobot.command.commands.music.Track;
 import morobot.command.commands.user.Instagram;
 import morobot.command.commands.user.ShowAvatar;
 import morobot.command.commands.user.UserInfo;
@@ -39,11 +37,8 @@ public class CommandManager {
         addCommand(new Kick());
         addCommand(new Join());
         addCommand(new Leave());
-        addCommand(new Pause());
         addCommand(new Play());
-        addCommand(new Queue());
         addCommand(new Stop());
-        addCommand(new Track());
     }
 
     private void addCommand(ICommand command) {

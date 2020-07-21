@@ -8,9 +8,11 @@ import morobot.command.CommandsStuff;
 import morobot.command.ICommand;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class Play extends CommandsStuff implements ICommand {
 
@@ -45,7 +47,10 @@ public class Play extends CommandsStuff implements ICommand {
         EmbedBuilder added = new EmbedBuilder();
         added.setColor(0x14f51b);
         added.setDescription(description);
-        event.getChannel().sendMessage(added.build()).queue();
+        event.getChannel().sendMessage(added.build())
+                .delay(3, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
         added.clear();
     }
 
@@ -70,7 +75,6 @@ public class Play extends CommandsStuff implements ICommand {
         }
         if (event.getArgs().size() == 0) {
             if (player.isPaused()) {
-                infoEmbed(event, Constants.CONTINUE_TO_PLAY);
                 player.setPaused(false);
                 return;
             }

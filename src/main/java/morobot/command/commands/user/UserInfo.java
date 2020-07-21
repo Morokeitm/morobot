@@ -71,7 +71,7 @@ public class UserInfo extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает информацию об участнике сервера.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + "\", " +
+                "**Использование:** \"" + App.PREFIX + this.commandName() + "\", " +
                 "либо \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\"";
     }
 

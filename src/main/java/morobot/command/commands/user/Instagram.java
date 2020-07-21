@@ -9,7 +9,6 @@ import morobot.command.CommandsStuff;
 import morobot.command.Constants;
 import morobot.command.ICommand;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.List;
 
@@ -18,7 +17,6 @@ public class Instagram extends CommandsStuff implements ICommand {
     @Override
     public void commandHandle(CommandContext event) {
         final List<String> args = event.getArgs();
-        final TextChannel channel = event.getChannel();
 
         if (args.isEmpty()) {
             errorEmbed(event, Constants.NO_USER_NAME);
@@ -30,10 +28,10 @@ public class Instagram extends CommandsStuff implements ICommand {
                 errorEmbed(event, json.get("error").get("message").asText());
                 return;
             }
-
+            event.getMessage().delete().queue();
             final JsonNode user = json.get("user");
             final String username = user.get("username").asText();
-            final String pfp = user.get("profile_pic_url").asText();
+            final String profilePic = user.get("profile_pic_url").asText();
             final String biography = user.get("biography").asText();
             final boolean isPrivate = user.get("is_private").asBoolean();
             final int following = user.get("following").get("count").asInt();
@@ -41,10 +39,14 @@ public class Instagram extends CommandsStuff implements ICommand {
             final int uploads = user.get("uploads").get("count").asInt();
 
             final EmbedBuilder instagram = EmbedUtils.defaultEmbed()
-                    .setTitle("Instagram info of " + username, "https://www.instagram.com/" + username)
-                    .setThumbnail(pfp)
+                    .setTitle("Информация из instagram: " + username, "https://www.instagram.com/" + username)
+                    .setThumbnail(profilePic)
                     .setDescription(String.format(
-                            "**Приватный аккаунт:** "+ (isPrivate ? "да" : "нет") +"\n**Биография:** %s\n**Подписан(а):** %s\n**Подписчики:** %s\n**Публикаций:** %s",
+                            "**Приватный аккаунт:** "+ (isPrivate ? "да" : "нет") + "\n" +
+                                    "**Биография:** %s\n" +
+                                    "**Подписан(а):** %s\n" +
+                                    "**Подписчики:** %s\n" +
+                                    "**Публикаций:** %s",
                             biography,
                             following,
                             followers,
@@ -52,7 +54,7 @@ public class Instagram extends CommandsStuff implements ICommand {
                     ))
                     .setImage(getLatestImage(json.get("images")));
 
-            channel.sendMessage(instagram.build()).queue();
+            event.getChannel().sendMessage(instagram.build()).queue();
         });
     }
 
@@ -73,8 +75,8 @@ public class Instagram extends CommandsStuff implements ICommand {
 
     @Override
     public String getHelp() {
-        return "Вытягивает общую информацию пользователя и последнюю публикацию из инстаграма.\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + " [имя в instagram]\"";
+        return "Вытягивает общую информацию пользователя и последнюю публикацию из инстаграма.\n\n" +
+                "**Использование:** \"" + App.PREFIX + this.commandName() + " [имя в instagram]\"";
     }
 
     @Override

@@ -5,7 +5,7 @@ import morobot.Config;
 import morobot.command.CommandContext;
 import morobot.command.CommandsStuff;
 import morobot.command.ICommand;
-import morobot.command.XReaction;
+import morobot.command.reactions.DeleteReaction;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -29,7 +29,7 @@ public class Help extends CommandsStuff implements ICommand {
         RestAction<Message> action = event.getChannel().sendMessage(info.build());
         action.queue(message -> {
             message.addReaction("❌").queue();
-            XReaction.putAndSave(message.getId(), event.getMember().getId());
+            DeleteReaction.putAndSave(message.getId(), event.getMember().getId());
         });
         info.clear();
     }
@@ -90,7 +90,7 @@ public class Help extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает список всех команд бота, либо информацию об указанной команде.\n\n" +
-                "Использование: \"" + Config.get("prefix") + this.commandName() + "\", " +
+                "**Использование:** \"" + Config.get("prefix") + this.commandName() + "\", " +
                 "либо \"" + Config.get("prefix") + this.commandName() + " [команда]\"";
     }
 

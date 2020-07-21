@@ -11,6 +11,7 @@
 test-output/
 target
 .env
+database.db
 
 # https://github.com/github/gitignore/blob/master/Global/MicrosoftOffice.gitignore
 *.tmp

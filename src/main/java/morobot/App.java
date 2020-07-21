@@ -1,24 +1,25 @@
 package morobot;
 
-import morobot.command.XReaction;
-import net.dv8tion.jda.api.AccountType;
-import net.dv8tion.jda.api.JDA;
+import morobot.database.SQLiteDataSource;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class App {
-    static JDA builder;
+
     public static final String PREFIX = Config.get("prefix");
 
-    public static void main(String[] args) throws Exception {
+    private App() throws Exception {
+        SQLiteDataSource.getConnection();
 
-        builder = new JDABuilder(AccountType.BOT).setToken(Config.get("token"))
+       new JDABuilder()
+                .setToken(Config.get("token"))
+                .addEventListeners(new Listener())
                 .setActivity(Activity.watching("Руководство по написанию ботов"))
                 .build();
 
-        builder.getPresence().setStatus(OnlineStatus.ONLINE);
-        builder.addEventListener(new Listener());
-        builder.addEventListener(new XReaction());
+    }
+
+    public static void main(String[] args) throws Exception {
+        new App();
     }
 }

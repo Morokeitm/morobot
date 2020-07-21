@@ -10,6 +10,7 @@ import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 
+@Deprecated
 public class Track extends CommandsStuff implements ICommand {
 
     private void getCurrentTrack(CommandContext event) {

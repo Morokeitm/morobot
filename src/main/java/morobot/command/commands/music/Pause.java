@@ -9,6 +9,7 @@ import morobot.command.ICommand;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.Permission;
 
+@Deprecated
 public class Pause extends CommandsStuff implements ICommand {
 
     private void pauseTrack(CommandContext event, AudioPlayer player) {
@@ -25,7 +26,6 @@ public class Pause extends CommandsStuff implements ICommand {
             return;
         }
         player.setPaused(true);
-        infoEmbed(event, Constants.TRACK_PAUSED);
     }
 
     @Override

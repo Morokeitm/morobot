@@ -10,10 +10,13 @@ import morobot.command.ICommand;
 import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class Queue extends CommandsStuff implements ICommand {
 
     private void getCurrentQueue(CommandContext event) {
@@ -41,7 +44,10 @@ public class Queue extends CommandsStuff implements ICommand {
             AudioTrackInfo trackInfo = track.getInfo();
             currentQueue.appendDescription((i + 1) + ") " + trackInfo.title + "\n\n");
         }
-        event.getChannel().sendMessage(currentQueue.build()).queue();
+        event.getChannel().sendMessage(currentQueue.build())
+                .delay(25, TimeUnit.SECONDS)
+                .flatMap(Message::delete)
+                .queue();
         currentQueue.clear();
     }
 
