@@ -14,8 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ClearMessages extends CommandsStuff implements ICommand {
 
-    private void deletedMessagesEmbed(CommandContext event, String count) {
-        List<Message> messages = event.getChannel().getHistory().retrievePast(Integer.parseInt(count) + 1).complete();
+    private void deletedMessagesEmbed(CommandContext event, String count, List<Message> messages) {
         event.getChannel().deleteMessages(messages).queue();
         EmbedBuilder complete = new EmbedBuilder();
         complete.setColor(0x14f51b);
@@ -30,7 +29,7 @@ public class ClearMessages extends CommandsStuff implements ICommand {
 
     @Override
     public void commandHandle(CommandContext event) {
-        if (!event.getMember().getPermissions().contains(Permission.MESSAGE_MANAGE)) {
+        if (!hasPermission(event)) {
             errorEmbed(event, Constants.NO_PERMISSION_TO_DELETE_MESSAGES, Constants.WHO_ABLE_TO_USE_COMMAND);
             return;
         }
@@ -38,8 +37,10 @@ public class ClearMessages extends CommandsStuff implements ICommand {
             errorEmbed(event, Constants.NO_COUNT_OF_MESSAGES, Constants.USAGE);
             return;
         }
+        String count = event.getArgs().get(0);
+        List<Message> messages = event.getChannel().getHistory().retrievePast(Integer.parseInt(count) + 1).complete();
         try {
-            deletedMessagesEmbed(event, event.getArgs().get(0));
+            deletedMessagesEmbed(event, count, messages);
         } catch (NumberFormatException e) {
             errorEmbed(event, Constants.NOT_A_DIGIT, Constants.USAGE);
         } catch (IllegalArgumentException e) {

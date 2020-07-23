@@ -46,7 +46,7 @@ public class QueueReaction implements IReaction {
         EmbedBuilder currentQueue = new EmbedBuilder();
         if (queue.isEmpty()) {
             currentQueue.setColor(0xf7f7f7);
-            currentQueue.setDescription("Тут пусто ¯\\_(ツ)_/¯");
+            currentQueue.setDescription("Тут пусто  ¯\\_(ツ)_/¯");
         } else {
             if (queue.size() < 3) currentQueue.setColor(0x61ff5e);
             if (queue.size() > 2 && queue.size() < 7) currentQueue.setColor(0xf7e85c);

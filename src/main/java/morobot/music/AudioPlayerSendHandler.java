@@ -22,22 +22,19 @@ public class AudioPlayerSendHandler implements AudioSendHandler {
      */
     public AudioPlayerSendHandler(AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
-        this.buffer = ByteBuffer.allocate(8192);
+        this.buffer = ByteBuffer.allocate(1024);
         this.frame = new MutableAudioFrame();
         this.frame.setBuffer(buffer);
     }
 
     @Override
     public boolean canProvide() {
-        // returns true if audio was provided
-        return audioPlayer.provide(frame);
+        return this.audioPlayer.provide(this.frame);
     }
 
     @Override
     public ByteBuffer provide20MsAudio() {
-        // flip to make it a read buffer
-        ((Buffer) buffer).flip();
-        return buffer;
+        return this.buffer.flip();
     }
 
     @Override

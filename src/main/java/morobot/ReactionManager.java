@@ -7,6 +7,7 @@ import morobot.command.reactions.PauseReaction;
 import morobot.command.reactions.PlayReaction;
 import morobot.command.reactions.DeleteReaction;
 import morobot.command.reactions.QueueReaction;
+import morobot.command.reactions.StopReaction;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
 import javax.annotation.Nullable;
@@ -22,6 +23,7 @@ public class ReactionManager {
         addReaction(new NextReaction());
         addReaction(new DeleteReaction());
         addReaction(new QueueReaction());
+        addReaction(new StopReaction());
     }
 
     private void addReaction(IReaction reaction) {

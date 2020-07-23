@@ -95,6 +95,7 @@ public class TrackScheduler extends AudioEventAdapter {
         action.queue((message) -> {
             message.addReaction("▶").queue();
             message.addReaction("\uD83D\uDCCB").queue();
+            message.addReaction("\uD83D\uDEAB").queue();
             trackEmbedId = message.getId();
         });
         pause.clear();
@@ -116,8 +117,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
         EmbedBuilder play = new EmbedBuilder();
         play.setColor(0x2374de);
-        play.setFooter("Сейчас играет");
-        play.setTitle(track.getInfo().title, Play.getUrlAdresses().get(0));
+        play.setTitle("Сейчас играет:");
+        play.setDescription("[" + track.getInfo().title + "]" + "(" + Play.getUrlAdresses().get(0) + ")");
         play.addField("Продолжительность:", min + ":" + sec, true);
         play.addField("Заказал:", Play.getUsers().get(0).getAsMention(), true);
         RestAction<Message> action = Listener.messageEvent
@@ -128,6 +129,7 @@ public class TrackScheduler extends AudioEventAdapter {
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();
             message.addReaction("\uD83D\uDCCB").queue();
+            message.addReaction("\uD83D\uDEAB").queue();
             trackEmbedId = message.getId();
         });
         play.clear();
@@ -147,8 +149,8 @@ public class TrackScheduler extends AudioEventAdapter {
         String sec = Long.toString(track.getDuration() % 60000 / 1000);
         EmbedBuilder play = new EmbedBuilder();
         play.setColor(0x2374de);
-        play.setFooter("Сейчас играет");
-        play.setTitle(track.getInfo().title, Play.getUrlAdresses().get(0));
+        play.setTitle("Сейчас играет:");
+        play.setDescription("[" + track.getInfo().title + "]" + "(" + Play.getUrlAdresses().get(0) + ")");
         play.addField("Продолжительность:", min + ":" + sec, true);
         play.addField("Заказал:", Play.getUsers().get(0).getAsMention(), true);
         RestAction<Message> action = Listener.messageEvent
@@ -159,6 +161,7 @@ public class TrackScheduler extends AudioEventAdapter {
             message.addReaction("⏸").queue();
             message.addReaction("⏩").queue();
             message.addReaction("\uD83D\uDCCB").queue();
+            message.addReaction("\uD83D\uDEAB").queue();
             trackEmbedId = message.getId();
         });
         play.clear();

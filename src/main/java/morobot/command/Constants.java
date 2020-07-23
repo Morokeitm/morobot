@@ -44,6 +44,7 @@ public class Constants {
     public static final String TRY_TO_DELETE_OLD_MESSAGES = "ты пытаешься удалить старые сообщения.";
     public static final String NOT_ABLE_TO_DELETE_OLD_MESSAGES = "Нельзя удалить сообщения, оставленные более двух недель назад.";
     public static final String NO_PERMISSION_TO_DELETE_MESSAGES = "у тебя нет прав на удаление сообщений.";
+    public static final String NO_MESSAGES = "на канале нет сообщений.";
 
     //Константы для класса "Play"
     public static final String NO_URL = "укажи ссылку к источнику.";

@@ -34,11 +34,11 @@ public class CommandManager {
         addCommand(new UserInfo());
         addCommand(new ClearMessages());
         addCommand(new TextMute());
+
         addCommand(new Kick());
         addCommand(new Join());
         addCommand(new Leave());
         addCommand(new Play());
-        addCommand(new Stop());
     }
 
     private void addCommand(ICommand command) {

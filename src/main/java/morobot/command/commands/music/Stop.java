@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class Stop extends CommandsStuff implements ICommand {
 
     private void stopAndClearQueue(CommandContext event) {
