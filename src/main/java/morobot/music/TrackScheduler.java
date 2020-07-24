@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.RestAction;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -55,6 +57,9 @@ public class TrackScheduler extends AudioEventAdapter {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         player.startTrack(queue.poll(), false);
+        if (queue.isEmpty() && player.getPlayingTrack() == null) {
+            startTimer();
+        }
     }
 
     @Override
@@ -73,6 +78,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (endReason.mayStartNext) {
             nextTrack();
         }
+        startTimer();
     }
 
     @Override
@@ -165,5 +171,18 @@ public class TrackScheduler extends AudioEventAdapter {
             trackEmbedId = message.getId();
         });
         play.clear();
+    }
+
+    private void startTimer() {
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (player.getPlayingTrack() != null) {
+                    return;
+                }
+                Listener.messageEvent.getGuild().getAudioManager().closeAudioConnection();
+            }
+        }, 60000);
     }
 }

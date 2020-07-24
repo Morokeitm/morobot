@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class Join extends CommandsStuff implements ICommand {
 
     private void isConnected(CommandContext event) {

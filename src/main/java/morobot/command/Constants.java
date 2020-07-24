@@ -47,7 +47,7 @@ public class Constants {
     public static final String NO_MESSAGES = "на канале нет сообщений.";
 
     //Константы для класса "Play"
-    public static final String NO_URL = "укажи ссылку к источнику.";
+    public static final String NO_URL = "укажи название песни, или ссылку к источнику.";
     public static final String NOT_AN_URL = "указанная ссылка некорректна.";
     public static final String CONTINUE_TO_PLAY = "Трек снят с паузы.";
     public static final String FAILED_SEARCH_RESULTS = "YouTube не дал результатов поиска.";

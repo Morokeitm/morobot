@@ -133,16 +133,15 @@ public class Play extends CommandsStuff implements ICommand {
             errorEmbed(event, Constants.WRONG_CHANNEL);
             return;
         }
-        if (!event.getGuild().getAudioManager().isConnected()) {
-            errorEmbed(event, Constants.NO_CONNECTION);
+        if (event.getArgs().size() == 0) {
+            errorEmbed(event, Constants.NO_URL);
             return;
         }
-        if (event.getArgs().size() == 0) {
-            if (player.isPaused()) {
-                player.setPaused(false);
-                return;
-            }
-            errorEmbed(event, Constants.NO_URL);
+        if (!event.getGuild().getAudioManager().isConnected()) {
+            event.getGuild()
+                    .getAudioManager()
+                    .openAudioConnection(event.getGuild()
+                            .getVoiceChannelById(Constants.MUSIC_CHANNEL_ID));
         }
         playSong(event, event.getArgs(), manager, player);
     }
