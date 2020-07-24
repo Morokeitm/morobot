@@ -173,7 +173,7 @@ public class TrackScheduler extends AudioEventAdapter {
         play.clear();
     }
 
-    private void startTimer() {
+    public void startTimer() {
         new Timer().schedule(new TimerTask() {
 
             @Override

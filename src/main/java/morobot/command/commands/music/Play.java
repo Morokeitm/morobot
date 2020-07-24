@@ -11,6 +11,7 @@ import morobot.command.CommandContext;
 import morobot.command.Constants;
 import morobot.command.CommandsStuff;
 import morobot.command.ICommand;
+import morobot.music.GuildMusicManager;
 import morobot.music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -57,10 +58,15 @@ public class Play extends CommandsStuff implements ICommand {
 
     private void playSong(CommandContext event, List<String> args, PlayerManager manager, AudioPlayer player) {
         String input = String.join(" ", args);
+        PlayerManager playerManager = PlayerManager.getInstance();
+        GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
         if (!isURL(input)) {
             String ytSearch = searchYoutube(input);
             if (ytSearch == null) {
                 errorEmbed(event, Constants.FAILED_SEARCH_RESULTS);
+                if (musicManager.player.getPlayingTrack() == null) {
+                    musicManager.scheduler.startTimer();
+                }
                 return;
             }
             input = ytSearch;
