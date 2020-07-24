@@ -14,7 +14,7 @@ public class App {
        new JDABuilder()
                 .setToken(Config.get("token"))
                 .addEventListeners(new Listener())
-                .setActivity(Activity.watching("Руководство по написанию ботов"))
+                .setActivity(Activity.watching("!help"))
                 .build();
 
     }

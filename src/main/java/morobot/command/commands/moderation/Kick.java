@@ -72,7 +72,7 @@ public class Kick extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Выгоняет пользователя с сервера.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() +
+                "**Использование:** \"" + App.PREFIX + this.commandName() +
                 " [упоминание участнника] [причина]\"";
     }
 

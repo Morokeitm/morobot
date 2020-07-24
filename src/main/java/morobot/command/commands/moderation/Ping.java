@@ -32,7 +32,7 @@ public class Ping extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает текущий пинг от бота до сервера дискорда.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + "\"";
+                "**Использование:** \"" + App.PREFIX + this.commandName() + "\"";
     }
 
     @Override

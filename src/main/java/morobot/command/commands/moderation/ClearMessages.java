@@ -64,7 +64,7 @@ public class ClearMessages extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Удаляет указанное количество последних сообщений.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + " [1-99]\"";
+                "**Использование:** \"" + App.PREFIX + this.commandName() + " [1-99]\"";
     }
 
     @Override

@@ -198,7 +198,7 @@ public class TextMute extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Отстраняет указанного участника сервера, выдавая ему роль мута.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\", " +
+                "**Использование:** \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\", " +
                 "либо \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника] [1-34560(мин)]\"";
     }
 

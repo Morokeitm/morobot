@@ -68,7 +68,7 @@ public class ShowAvatar extends CommandsStuff implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает картинку на аватаре участника сервера.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + "\", " +
+                "**Использование:** \"" + App.PREFIX + this.commandName() + "\", " +
                 "либо \"" + App.PREFIX + this.commandName() + " [имя / упоминание участника]\"";
     }
 

@@ -64,12 +64,15 @@ public class Play extends CommandsStuff implements ICommand {
             String ytSearch = searchYoutube(input);
             if (ytSearch == null) {
                 errorEmbed(event, Constants.FAILED_SEARCH_RESULTS);
-                if (musicManager.player.getPlayingTrack() == null) {
-                    musicManager.scheduler.startTimer();
-                }
                 return;
             }
             input = ytSearch;
+        }
+        if (!event.getGuild().getAudioManager().isConnected()) {
+            event.getGuild()
+                    .getAudioManager()
+                    .openAudioConnection(event.getGuild()
+                            .getVoiceChannelById(Constants.MUSIC_CHANNEL_ID));
         }
         urlAdresses.add(input);
         users.add(event.getAuthor());
@@ -143,12 +146,6 @@ public class Play extends CommandsStuff implements ICommand {
             errorEmbed(event, Constants.NO_URL);
             return;
         }
-        if (!event.getGuild().getAudioManager().isConnected()) {
-            event.getGuild()
-                    .getAudioManager()
-                    .openAudioConnection(event.getGuild()
-                            .getVoiceChannelById(Constants.MUSIC_CHANNEL_ID));
-        }
         playSong(event, event.getArgs(), manager, player);
     }
 
@@ -159,9 +156,9 @@ public class Play extends CommandsStuff implements ICommand {
 
     @Override
     public String getHelp() {
-        return "Ставит в очередь указанный трек, либо снимает текущий трек с паузы.\n\n" +
-                "Использование: \"" + App.PREFIX + this.commandName() + "\", " +
-                "либо \"" + App.PREFIX + this.commandName() + " [ссылка]\"";
+        return "Ставит в очередь указанную песню.\n" +
+                "Можно использовать только в канале **\"music\"**.\n\n" +
+                "**Использование:** \"" + App.PREFIX + this.commandName() + " [ссылка / название песни]\"";
     }
 
     @Override

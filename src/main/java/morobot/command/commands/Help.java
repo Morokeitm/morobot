@@ -65,10 +65,11 @@ public class Help extends CommandsStuff implements ICommand {
                     .forEach(command -> {
                         i[0]++;
                         builder
-                            .append("\"")
-                            .append(Config.get("prefix"))
-                            .append(command)
-                            .append("\"" + (i[0] % 7 == 0 ? "\n" : "  "));});
+                                .append("\"")
+                                .append(Config.get("prefix"))
+                                .append(command)
+                                .append("\"")
+                                .append(i[0] % 7 == 0 ? "\n" : "  ");});
             commandListEmbed(event, builder.toString());
             return;
         }
